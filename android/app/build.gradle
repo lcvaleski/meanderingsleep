@@ -81,9 +81,9 @@ android {
         buildConfig = true
     }
 
-    namespace "com.meanderingsleep"
+    namespace "net.coventry.sleepless"
     defaultConfig {
-        applicationId "com.meanderingsleep"
+        applicationId "net.coventry.sleepless"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
