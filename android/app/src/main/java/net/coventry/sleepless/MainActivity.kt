@@ -1,4 +1,4 @@
-package com.meanderingsleep
+package net.coventry.sleepless
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

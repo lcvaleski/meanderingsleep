@@ -1,4 +1,4 @@
-package com.meanderingsleep
+package net.coventry.sleepless
 
 import android.app.Application
 import com.facebook.react.PackageList
