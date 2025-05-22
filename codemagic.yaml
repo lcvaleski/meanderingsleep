@@ -8,6 +8,21 @@ workflows:
             - React meandering-keystore
           vars:
             PACKAGE_NAME: "net.coventry.sleepless"
+        scripts:
+          - name: Install npm dependencies
+            script: | 
+              npm install
+          - name: Set Android SDK location
+            script: | 
+              echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+          - name: Build Android release
+            script: | 
+              cd android
+              ./gradlew bundleRelease
+
+        artifacts:
+          - android/app/build/outputs/**/*.aab
+
     ios-workflow:
         name: iOS Workflow
         max_build_duration: 120
@@ -15,3 +30,5 @@ workflows:
         environment:
           vars:
             BUNDLE_ID: "net.coventry.sleepless"
+            XCODE_WORKSPACE: "meanderingsleep.xcworkspace"
+            XCODE_SCHEME: "meanderingsleep"
