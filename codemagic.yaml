@@ -32,3 +32,14 @@ workflows:
             BUNDLE_ID: "net.coventry.sleepless"
             XCODE_WORKSPACE: "meanderingsleep.xcworkspace"
             XCODE_SCHEME: "meanderingsleep"
+        scripts:
+          - name: Build ipa for distribution
+            script: | 
+              xcode-project build-ipa \
+                --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
+                --scheme "$XCODE_SCHEME"
+        artifacts:
+          - build/ios/ipa/*.ipa
+          - /tmp/xcodebuild_logs/*.log
+          - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+          - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
