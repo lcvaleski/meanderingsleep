@@ -33,6 +33,10 @@ workflows:
             XCODE_WORKSPACE: "meanderingsleep.xcworkspace"
             XCODE_SCHEME: "meanderingsleep"
         scripts:
+          - name: Install CocoaPods dependencies
+            script: |
+              cd ios
+              pod install
           - name: Build ipa for distribution
             script: | 
               xcode-project build-ipa \
