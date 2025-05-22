@@ -5,4 +5,13 @@ workflows:
         instance_type: mac_mini_m2
         environment:
           android_signing:
-            - keystore_reference
+            - React meandering-keystore
+          vars:
+            PACKAGE_NAME: "net.coventry.sleepless"
+    ios-workflow:
+        name: iOS Workflow
+        max_build_duration: 120
+        instance_type: mac_mini_m2
+        environment:
+          vars:
+            BUNDLE_ID: "net.coventry.sleepless"
