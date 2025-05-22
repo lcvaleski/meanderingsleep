@@ -33,6 +33,9 @@ workflows:
             XCODE_WORKSPACE: "meanderingsleep.xcworkspace"
             XCODE_SCHEME: "meanderingsleep"
         scripts:
+          - name: Install npm dependencies
+            script: |
+              npm install
           - name: Install CocoaPods dependencies
             script: |
               cd ios
