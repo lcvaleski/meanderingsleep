@@ -1,58 +1,60 @@
 workflows:
-    android-workflow:
-        name: Android Workflow
-        max_build_duration: 120
-        instance_type: mac_mini_m2
-        environment:
-          android_signing:
-            - React meandering-keystore
-          vars:
-            PACKAGE_NAME: "net.coventry.sleepless"
-        scripts:
-          - name: Install npm dependencies
-            script: | 
-              npm install
-          - name: Set Android SDK location
-            script: | 
-              echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
-          - name: Build Android release
-            script: | 
-              cd android
-              ./gradlew bundleRelease
+  android-workflow:
+    name: Android Workflow
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    environment:
+      android_signing:
+        - React meandering-keystore
+      vars:
+        PACKAGE_NAME: "net.coventry.sleepless"
+    scripts:
+      - name: Install npm dependencies
+        script: | 
+          npm install
+      - name: Set Android SDK location
+        script: | 
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Build Android release
+        script: | 
+          cd android
+          ./gradlew bundleRelease
+    artifacts:
+      - android/app/build/outputs/**/*.aab
 
-        artifacts:
-          - android/app/build/outputs/**/*.aab
-
-    ios-workflow:
-        name: iOS Workflow
-        max_build_duration: 120
-        instance_type: mac_mini_m2
-        environment:
-          vars:
-            BUNDLE_ID: "net.coventry.sleepless"
-            XCODE_WORKSPACE: "meanderingsleep.xcworkspace"
-            XCODE_SCHEME: "meanderingsleep"
-        signing:
-          automatic_code_signing:
-            apple_team_id: F2S9M6EX9E
-            bundle_identifier: "net.coventry.sleepless"
-            export_method: app-store
-        scripts:
-          - name: Install npm dependencies
-            script: |
-              npm install
-          - name: Install CocoaPods dependencies
-            script: |
-              cd ios
-              pod install
-          - name: Build ipa for distribution
-            script: | 
-              xcode-project build-ipa \
-                --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
-                --scheme "$XCODE_SCHEME" \
-                --export-options-plist "$CM_BUILD_DIR/ios/export_options.plist"
-        artifacts:
-          - build/ios/ipa/*.ipa
-          - /tmp/xcodebuild_logs/*.log
-          - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-          - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+  ios-workflow:
+    name: iOS Workflow
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      groups:
+        - production
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: net.coventry.sleepless
+      vars:
+        XCODE_WORKSPACE: "meanderingsleep.xcworkspace"
+        XCODE_SCHEME: "meanderingsleep"
+      node: 18.16.0
+      cocoapods: default
+      xcode: latest
+    scripts:
+      - name: Install JS & native dependencies
+        script: |
+          npm install
+          cd ios && pod install && cd ..
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+      - name: Build .ipa for release
+        script: |
+          xcode-project build-ipa \
+            --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
