@@ -56,9 +56,7 @@ workflows:
       vars:
         XCODE_WORKSPACE: "meanderingsleep.xcworkspace"
         XCODE_SCHEME: "meanderingsleep"
-      node: 18.16.0
-      cocoapods: default
-      xcode: latest
+        APP_STORE_APPLE_ID: 6502964632
     scripts:
       - name: Install JS & native dependencies
         script: |
@@ -67,6 +65,12 @@ workflows:
       - name: Set up code signing
         script: |
           xcode-project use-profiles
+      - name: Increment build number
+        script: | 
+          #!/bin/sh
+          cd $CM_BUILD_DIR
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
+          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       - name: Build .ipa for release
         script: |
           xcode-project build-ipa \
