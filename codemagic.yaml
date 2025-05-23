@@ -32,8 +32,7 @@ workflows:
             BUNDLE_ID: "net.coventry.sleepless"
             XCODE_WORKSPACE: "meanderingsleep.xcworkspace"
             XCODE_SCHEME: "meanderingsleep"
-          ios_signing:
-            provisioning_profiles: []
+          signing:
             automatic_code_signing:
               apple_team_id: F2S9M6EX9E
               bundle_identifier: "net.coventry.sleepless"
