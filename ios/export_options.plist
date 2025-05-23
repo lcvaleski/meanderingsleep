@@ -4,8 +4,6 @@
 <dict>
     <key>method</key>
     <string>app-store</string>
-    <key>teamID</key>
-    <string>F2S9M6EX9E</string>
     <key>signingStyle</key>
     <string>automatic</string>
     <key>stripSwiftSymbols</key>
