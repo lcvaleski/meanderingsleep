@@ -6,6 +6,8 @@ workflows:
     environment:
       android_signing:
         - React meandering-keystore
+      groups:
+        - google_credentials
       vars:
         PACKAGE_NAME: "net.coventry.sleepless"
     scripts:
