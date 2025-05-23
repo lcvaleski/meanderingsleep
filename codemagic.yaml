@@ -49,8 +49,6 @@ workflows:
     integrations:
       app_store_connect: codemagic
     environment:
-      groups:
-        - production
       ios_signing:
         distribution_type: app_store
         bundle_identifier: net.coventry.sleepless
