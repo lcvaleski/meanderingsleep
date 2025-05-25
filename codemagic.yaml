@@ -28,12 +28,18 @@ workflows:
         script: | 
           npm install
       
-      # Step 2: Configure Android SDK location in local.properties
+      # Step 2: Run tests
+      - name: Run tests
+        script: |
+          npm run lint
+          CI=true npm run test -- --maxWorkers=2
+      
+      # Step 3: Configure Android SDK location in local.properties
       - name: Set Android SDK location
         script: | 
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
       
-      # Step 3: Build the Android release bundle with auto-incremented version number
+      # Step 4: Build the Android release bundle with auto-incremented version number
       - name: Build Android release
         script: | 
           # Fetch the latest build number from Google Play
@@ -58,6 +64,8 @@ workflows:
     # Files to save after build completion
     artifacts:
       - android/app/build/outputs/**/*.aab  # Android App Bundle for release
+      - coverage/**/*  # Test coverage reports
+      - android/app/build/reports/**/*  # Android build reports
 
     # Publishing configuration for Google Play Store
     publishing:
@@ -97,14 +105,20 @@ workflows:
           npm install
           cd ios && pod install && cd ..
       
-      # Step 2: Configure code signing based on profiles from Codemagic
+      # Step 2: Run tests
+      - name: Run tests
+        script: |
+          npm run lint
+          CI=true npm run test -- --maxWorkers=2
+      
+      # Step 3: Configure code signing based on profiles from Codemagic
       - name: Set up code signing
         script: |
           xcode-project use-profiles
       
 
       
-      # Step 3: Set version and increment build number based on TestFlight
+      # Step 4: Set version and increment build number based on TestFlight
       - name: Set version and build number
         script: | 
           #!/bin/sh
@@ -116,7 +130,7 @@ workflows:
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
           agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       
-      # Step 4: Build the iOS app and create an IPA package
+      # Step 5: Build the iOS app and create an IPA package
       - name: Build .ipa for release
         script: |
           xcode-project build-ipa \
@@ -129,6 +143,7 @@ workflows:
       - /tmp/xcodebuild_logs/*.log  # Build logs for debugging
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app  # Built app
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM  # Debug symbols
+      - coverage/**/*  # Test coverage reports
 
     # Publishing configuration for App Store Connect
     publishing:
