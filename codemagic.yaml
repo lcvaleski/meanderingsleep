@@ -20,7 +20,7 @@ workflows:
       # Custom environment variables for this workflow
       vars:
         PACKAGE_NAME: "net.coventry.sleepless"  # Android application ID
-        APP_VERSION: "1.0.0"  # Application version number (semver)
+        APP_VERSION: "0.2.2"  # Application version number (semver)
     
     scripts:
       # Step 1: Install all JavaScript dependencies from package.json
@@ -32,7 +32,7 @@ workflows:
       - name: Run tests
         script: |
           npm run lint
-          CI=true npm run test -- --maxWorkers=2
+          npm run test
       
       # Step 3: Configure Android SDK location in local.properties
       - name: Set Android SDK location
@@ -51,8 +51,10 @@ workflows:
             # BUILD_NUMBER is automatically incremented with each build in this workflow
             UPDATED_BUILD_NUMBER=$BUILD_NUMBER
           else
-            # Increment the build number from Google Play by 1
-            UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 1))
+            # Increment the build number from Google Play by 5 for a safety margin
+            # This handles potential issues with stale or cached data
+            UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 5))
+            echo "Latest build number from Google Play: $LATEST_GOOGLE_PLAY_BUILD_NUMBER, setting to: $UPDATED_BUILD_NUMBER"
           fi
           
           # Navigate to Android directory and execute Gradle build
@@ -64,9 +66,6 @@ workflows:
     # Files to save after build completion
     artifacts:
       - android/app/build/outputs/**/*.aab  # Android App Bundle for release
-      - coverage/**/*  # Test coverage reports
-      - android/app/build/reports/**/*  # Android build reports
-
     # Publishing configuration for Google Play Store
     publishing:
       google_play:
@@ -96,7 +95,7 @@ workflows:
         XCODE_WORKSPACE: "meanderingsleep.xcworkspace"  # Xcode workspace file name
         XCODE_SCHEME: "meanderingsleep"  # Xcode build scheme name
         APP_STORE_APPLE_ID: 6502964632  # App's unique identifier in App Store Connect
-        APP_VERSION: "1.0.0"  # Application version number (semver)
+        APP_VERSION: "0.2.2"  # Application version number (semver)
     
     scripts:
       # Step 1: Install all dependencies (JS and native iOS through CocoaPods)
@@ -109,7 +108,7 @@ workflows:
       - name: Run tests
         script: |
           npm run lint
-          CI=true npm run test -- --maxWorkers=2
+          npm run test
       
       # Step 3: Configure code signing based on profiles from Codemagic
       - name: Set up code signing
@@ -128,7 +127,11 @@ workflows:
           
           # Set build number (CFBundleVersion)
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
-          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+          # Add a safety margin to ensure we're above any existing build number
+          # Also handles case where the API returns stale data
+          NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 5))
+          echo "Latest build number from App Store: $LATEST_BUILD_NUMBER, setting to: $NEW_BUILD_NUMBER"
+          agvtool new-version -all $NEW_BUILD_NUMBER
       
       # Step 5: Build the iOS app and create an IPA package
       - name: Build .ipa for release
@@ -143,8 +146,6 @@ workflows:
       - /tmp/xcodebuild_logs/*.log  # Build logs for debugging
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app  # Built app
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM  # Debug symbols
-      - coverage/**/*  # Test coverage reports
-
     # Publishing configuration for App Store Connect
     publishing:
       app_store_connect:
