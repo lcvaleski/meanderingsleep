@@ -20,6 +20,7 @@ workflows:
       # Custom environment variables for this workflow
       vars:
         PACKAGE_NAME: "net.coventry.sleepless"  # Android application ID
+        APP_VERSION: "1.0.0"  # Application version number (semver)
     
     scripts:
       # Step 1: Install all JavaScript dependencies from package.json
@@ -52,7 +53,7 @@ workflows:
           cd android
           ./gradlew bundleRelease \
               -PversionCode=$UPDATED_BUILD_NUMBER \
-              -PversionName=1.0.$UPDATED_BUILD_NUMBER
+              -PversionName=$APP_VERSION
     
     # Files to save after build completion
     artifacts:
@@ -87,6 +88,7 @@ workflows:
         XCODE_WORKSPACE: "meanderingsleep.xcworkspace"  # Xcode workspace file name
         XCODE_SCHEME: "meanderingsleep"  # Xcode build scheme name
         APP_STORE_APPLE_ID: 6502964632  # App's unique identifier in App Store Connect
+        APP_VERSION: "1.0.0"  # Application version number (semver)
     
     scripts:
       # Step 1: Install all dependencies (JS and native iOS through CocoaPods)
@@ -102,11 +104,15 @@ workflows:
       
 
       
-      # Step 3: Increment build number based on TestFlight
-      - name: Increment build number
+      # Step 3: Set version and increment build number based on TestFlight
+      - name: Set version and build number
         script: | 
           #!/bin/sh
           cd $CM_BUILD_DIR/ios
+          # Set marketing version (CFBundleShortVersionString)
+          xcrun agvtool new-marketing-version $APP_VERSION
+          
+          # Set build number (CFBundleVersion)
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
           agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       
