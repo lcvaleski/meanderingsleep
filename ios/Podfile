@@ -8,11 +8,8 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
-end
+# Force all dependencies to use frameworks
+use_frameworks! :linkage => :static
 
 target 'meanderingsleep' do
   config = use_native_modules!
@@ -23,6 +20,16 @@ target 'meanderingsleep' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Firebase pods
+  pod 'Firebase'
+  pod 'FirebaseCore'
+  pod 'FirebaseAuth'
+  pod 'GoogleUtilities'
+  pod 'FirebaseCoreInternal'
+  pod 'FirebaseAuthInterop'
+  pod 'FirebaseAppCheckInterop'
+  pod 'FirebaseCoreExtension'
+
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
@@ -31,5 +38,12 @@ target 'meanderingsleep' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # This is necessary for Xcode 14+
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min_ios_version_supported
+      end
+    end
   end
 end
