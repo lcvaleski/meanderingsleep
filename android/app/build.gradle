@@ -101,13 +101,16 @@ android {
         versionName getMyVersionName()
     }
     signingConfigs {
+        debug {
+            // Default debug config, no custom keystore needed
+        }
         release {
             if (System.getenv()["CI"]) {
                 storeFile file(System.getenv()["CM_KEYSTORE_PATH"])
                 storePassword System.getenv()["CM_KEYSTORE_PASSWORD"]
                 keyAlias System.getenv()["CM_KEY_ALIAS"]
                 keyPassword System.getenv()["CM_KEY_PASSWORD"]
-            } else if (keystoreProperties['storeFile']) {
+            } else if (project.hasProperty('keystoreProperties') && keystoreProperties['storeFile']) {
                 storeFile file(keystoreProperties['storeFile'])
                 storePassword keystoreProperties['storePassword']
                 keyAlias keystoreProperties['keyAlias']

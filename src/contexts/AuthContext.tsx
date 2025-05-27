@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, getCurrentUser } from '../config/firebase';
+import { getAuth, onAuthStateChanged, FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from '../config/firebase';
 
 interface AuthContextData {
   user: FirebaseAuthTypes.User | null;
@@ -17,7 +17,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged((user) => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
     });
@@ -27,8 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
-      const user = await signInWithEmailAndPassword(email, password);
-      setUser(user);
+      await signInWithEmailAndPassword(email, password);
     } catch (error) {
       throw error;
     }
@@ -36,8 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string) => {
     try {
-      const user = await createUserWithEmailAndPassword(email, password);
-      setUser(user);
+      await createUserWithEmailAndPassword(email, password);
     } catch (error) {
       throw error;
     }
@@ -46,7 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       await signOut();
-      setUser(null);
     } catch (error) {
       throw error;
     }

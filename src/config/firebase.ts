@@ -1,4 +1,4 @@
-import auth from '@react-native-firebase/auth';
+import { getAuth, signInWithEmailAndPassword as firebaseSignIn, createUserWithEmailAndPassword as firebaseCreateUser, signOut as firebaseSignOut } from '@react-native-firebase/auth';
 
 // Initialize Firebase Auth
 export const initializeFirebase = () => {
@@ -9,7 +9,8 @@ export const initializeFirebase = () => {
 // Authentication functions
 export const signInWithEmailAndPassword = async (email: string, password: string) => {
   try {
-    const userCredential = await auth().signInWithEmailAndPassword(email, password);
+    const auth = getAuth();
+    const userCredential = await firebaseSignIn(auth, email, password);
     return userCredential.user;
   } catch (error) {
     throw error;
@@ -18,7 +19,8 @@ export const signInWithEmailAndPassword = async (email: string, password: string
 
 export const createUserWithEmailAndPassword = async (email: string, password: string) => {
   try {
-    const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+    const auth = getAuth();
+    const userCredential = await firebaseCreateUser(auth, email, password);
     return userCredential.user;
   } catch (error) {
     throw error;
@@ -27,12 +29,14 @@ export const createUserWithEmailAndPassword = async (email: string, password: st
 
 export const signOut = async () => {
   try {
-    await auth().signOut();
+    const auth = getAuth();
+    await firebaseSignOut(auth);
   } catch (error) {
     throw error;
   }
 };
 
 export const getCurrentUser = () => {
-  return auth().currentUser;
+  const auth = getAuth();
+  return auth.currentUser;
 }; 
