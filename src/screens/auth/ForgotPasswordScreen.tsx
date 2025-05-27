@@ -22,7 +22,15 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
         [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
       );
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      let message = 'Failed to send reset email. Please try again.';
+      if (error.code === 'auth/invalid-email') {
+        message = 'Invalid email address.';
+      } else if (error.code === 'auth/user-not-found') {
+        message = 'No user found with this email.';
+      } else if (error.message) {
+        message = error.message.replace(/\[.*?\]\s*/, '');
+      }
+      Alert.alert('Error', message);
     }
   };
 

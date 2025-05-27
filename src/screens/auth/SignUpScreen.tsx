@@ -6,33 +6,62 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+
+const validateEmail = (email: string) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
 
 export const SignUpScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { signUp } = useAuth();
+  const [error, setError] = useState('');
+  const { signUp, loading } = useAuth();
 
   const handleSignUp = async () => {
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+    setError('');
+    if (!email || !password || !confirmPassword) {
+      setError('All fields are required.');
       return;
     }
-
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
     try {
       await signUp(email, password);
       navigation.replace('AuthLoading');
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      let message = 'Sign up failed. Please try again.';
+      if (error.code === 'auth/email-already-in-use') {
+        message = 'This email is already in use.';
+      } else if (error.code === 'auth/invalid-email') {
+        message = 'Invalid email address.';
+      } else if (error.code === 'auth/weak-password') {
+        message = 'Password is too weak.';
+      } else if (error.message) {
+        message = error.message;
+      }
+      setError(message);
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
-      
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -41,7 +70,6 @@ export const SignUpScreen = ({ navigation }: any) => {
         autoCapitalize="none"
         keyboardType="email-address"
       />
-      
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -49,7 +77,6 @@ export const SignUpScreen = ({ navigation }: any) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-
       <TextInput
         style={styles.input}
         placeholder="Confirm Password"
@@ -57,14 +84,21 @@ export const SignUpScreen = ({ navigation }: any) => {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
-
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+      <TouchableOpacity
+        style={[styles.button, loading && { opacity: 0.6 }]}
+        onPress={handleSignUp}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Sign Up</Text>
+        )}
       </TouchableOpacity>
-
       <TouchableOpacity
         style={styles.loginLink}
         onPress={() => navigation.navigate('Login')}
+        disabled={loading}
       >
         <Text style={styles.loginText}>
           Already have an account? <Text style={styles.loginTextBold}>Login</Text>
@@ -120,5 +154,10 @@ const styles = StyleSheet.create({
   loginTextBold: {
     color: '#007AFF',
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+    textAlign: 'center',
   },
 }); 
