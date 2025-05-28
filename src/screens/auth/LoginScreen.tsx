@@ -7,8 +7,11 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
+import auth from '@react-native-firebase/auth';
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,6 +68,28 @@ export const LoginScreen = ({ navigation }: any) => {
     }
   };
 
+  const handleAppleSignIn = async () => {
+    try {
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      });
+
+      const { identityToken, nonce } = appleAuthRequestResponse;
+
+      if (identityToken && nonce) {
+        const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
+        await auth().signInWithCredential(appleCredential);
+        console.log('Firebase sign in with Apple successful!');
+        navigation.replace('AuthLoading');
+      } else {
+        throw new Error('Apple Sign-In failed: Missing identityToken or nonce');
+      }
+    } catch (error) {
+      console.error('Apple Sign-In Error:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
@@ -116,6 +141,15 @@ export const LoginScreen = ({ navigation }: any) => {
       >
         <Text style={styles.googleButtonText}>Sign in with Google</Text>
       </TouchableOpacity>
+
+      {Platform.OS === 'ios' && (
+        <AppleButton
+          buttonStyle={AppleButton.Style.BLACK}
+          buttonType={AppleButton.Type.SIGN_IN}
+          style={{ width: '100%', height: 44, marginTop: 10 }}
+          onPress={handleAppleSignIn}
+        />
+      )}
 
       <TouchableOpacity
         style={styles.signUpLink}
