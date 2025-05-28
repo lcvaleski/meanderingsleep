@@ -19,7 +19,7 @@ export const LoginScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { signIn, loading } = useAuth();
+  const { signIn, signInWithGoogle, loading } = useAuth();
 
   const handleLogin = async () => {
     setError('');
@@ -46,6 +46,19 @@ export const LoginScreen = ({ navigation }: any) => {
       } else if (error.code === 'auth/invalid-credential') {
         message = 'The email or password is incorrect or has expired.';
       } else if (error.message) {
+        message = error.message.replace(/\[.*?\]\s*/, '');
+      }
+      setError(message);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      navigation.replace('AuthLoading');
+    } catch (error: any) {
+      let message = 'Google Sign-In failed. Please try again.';
+      if (error.message) {
         message = error.message.replace(/\[.*?\]\s*/, '');
       }
       setError(message);
@@ -89,6 +102,21 @@ export const LoginScreen = ({ navigation }: any) => {
           <Text style={styles.buttonText}>Login</Text>
         )}
       </TouchableOpacity>
+
+      <View style={styles.divider}>
+        <View style={styles.dividerLine} />
+        <Text style={styles.dividerText}>OR</Text>
+        <View style={styles.dividerLine} />
+      </View>
+
+      <TouchableOpacity
+        style={[styles.googleButton, loading && { opacity: 0.6 }]}
+        onPress={handleGoogleSignIn}
+        disabled={loading}
+      >
+        <Text style={styles.googleButtonText}>Sign in with Google</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.signUpLink}
         onPress={() => navigation.navigate('SignUp')}
@@ -161,5 +189,33 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 10,
     textAlign: 'center',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ddd',
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    color: '#666',
+  },
+  googleButton: {
+    backgroundColor: '#fff',
+    height: 50,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  googleButtonText: {
+    color: '#333',
+    fontSize: 16,
+    fontWeight: '500',
   },
 }); 
