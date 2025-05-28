@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+import { Button } from '../../design-system/components/Button';
+import { FormField } from '../../design-system/components/FormField';
+import { colors, typography, spacing } from '../../design-system/theme';
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,6 +16,8 @@ export const SignUpScreen = ({ navigation }: any) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const { signUp, loading } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSignUp = async () => {
     setError('');
@@ -60,49 +57,62 @@ export const SignUpScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
+      {/* Logo Placeholder */}
+      <View style={styles.logoContainer}>
+        <Text style={styles.logo}>💤</Text>
+      </View>
       <Text style={styles.title}>Create Account</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
-      <TouchableOpacity
-        style={[styles.button, loading && { opacity: 0.6 }]}
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Email<Text style={styles.asterisk}>*</Text></Text>
+        <FormField
+          placeholder="example@email.com"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          editable={!loading}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Password<Text style={styles.asterisk}>*</Text></Text>
+        <FormField
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+          editable={!loading}
+          icon={<Text onPress={() => setShowPassword(v => !v)} style={{color: colors.primary.white}}>{showPassword ? '🙈' : '👁️'}</Text>}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Confirm Password<Text style={styles.asterisk}>*</Text></Text>
+        <FormField
+          placeholder="Enter your password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry={!showConfirmPassword}
+          editable={!loading}
+          icon={<Text onPress={() => setShowConfirmPassword(v => !v)} style={{color: colors.primary.white}}>{showConfirmPassword ? '🙈' : '👁️'}</Text>}
+          style={styles.input}
+        />
+      </View>
+      <Button
+        title="Sign Up"
         onPress={handleSignUp}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Sign Up</Text>
-        )}
-      </TouchableOpacity>
+        variant="primary"
+        size="large"
+        loading={loading}
+        style={styles.button}
+      />
       <TouchableOpacity
-        style={styles.loginLink}
         onPress={() => navigation.navigate('Login')}
         disabled={loading}
+        style={styles.loginLink}
       >
-        <Text style={styles.loginText}>
-          Already have an account? <Text style={styles.loginTextBold}>Login</Text>
-        </Text>
+        <Text style={styles.loginText}>Already have an account? <Text style={styles.loginTextBold}>Login</Text></Text>
       </TouchableOpacity>
     </View>
   );
@@ -111,53 +121,64 @@ export const SignUpScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.primary.eclipse,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+    marginTop: spacing.xl,
+  },
+  logo: {
+    fontSize: 48,
+    color: colors.primary.white,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 30,
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.bold,
+    marginBottom: spacing.xl,
     textAlign: 'center',
+    color: colors.primary.white,
+  },
+  fieldGroup: {
+    marginBottom: spacing.md,
+  },
+  label: {
+    color: colors.primary.white,
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.fontSize.md,
+    marginBottom: spacing.xs,
+  },
+  asterisk: {
+    color: colors.primary.orchid,
+    fontSize: typography.fontSize.md,
   },
   input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    fontSize: 16,
+    marginBottom: 0,
   },
   button: {
-    backgroundColor: '#007AFF',
-    height: 50,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 15,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: spacing.xl,
+    marginBottom: spacing.md,
   },
   loginLink: {
-    marginTop: 20,
     alignItems: 'center',
+    marginTop: 0,
   },
   loginText: {
-    fontSize: 14,
-    color: '#666',
+    color: colors.primary.white,
+    fontSize: typography.fontSize.md,
+    textAlign: 'center',
   },
   loginTextBold: {
-    color: '#007AFF',
+    color: colors.primary.white,
     fontWeight: 'bold',
   },
   errorText: {
-    color: 'red',
-    marginBottom: 10,
+    color: colors.secondary.coral,
+    marginBottom: spacing.sm,
     textAlign: 'center',
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.sm,
   },
 }); 

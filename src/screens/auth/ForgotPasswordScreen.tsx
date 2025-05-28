@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { getAuth, sendPasswordResetEmail } from '@react-native-firebase/auth';
+import { Button } from '../../design-system/components/Button';
+import { FormField } from '../../design-system/components/FormField';
+import { colors, typography, spacing } from '../../design-system/theme';
 
 export const ForgotPasswordScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
@@ -40,26 +36,28 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
       <Text style={styles.subtitle}>
         Enter your email address and we'll send you instructions to reset your password.
       </Text>
-      
-      <TextInput
-        style={styles.input}
+      <FormField
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        style={styles.input}
       />
-
-      <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
-        <Text style={styles.buttonText}>Send Reset Link</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.backLink}
+      <Button
+        title="Send Reset Link"
+        onPress={handleResetPassword}
+        variant="primary"
+        size="large"
+        style={styles.button}
+      />
+      <Button
+        title="Back to Login"
         onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.backText}>Back to Login</Text>
-      </TouchableOpacity>
+        variant="secondary"
+        size="small"
+        style={styles.backLink}
+      />
     </View>
   );
 };
@@ -67,50 +65,31 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.primary.nocturne,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.bold,
+    marginBottom: spacing.md,
     textAlign: 'center',
+    color: colors.primary.white,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: typography.fontSize.md,
+    color: colors.primary.white,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: spacing.xl,
+    fontFamily: typography.fontFamily.regular,
   },
   input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    fontSize: 16,
+    marginBottom: spacing.md,
   },
   button: {
-    backgroundColor: '#007AFF',
-    height: 50,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 15,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: spacing.sm,
   },
   backLink: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  backText: {
-    fontSize: 14,
-    color: '#007AFF',
+    marginTop: spacing.lg,
   },
 }); 
