@@ -91,6 +91,10 @@ workflows:
       app_store_connect: codemagic  # Uses App Store Connect API key named 'codemagic'
     
     environment:
+
+      groups:
+        - google_credentials  # Contains Google Play API access credentials
+
       # iOS code signing configuration for App Store distribution
       ios_signing:
         distribution_type: app_store  # Type of distribution
@@ -121,9 +125,13 @@ workflows:
         script: |
           xcode-project use-profiles
       
-
+      # Step 4: Set up Firebase configuration for iOS
+      - name: Set up Firebase configuration
+        script: |
+          # Decode the base64-encoded GoogleService-Info.plist and write it to the correct location
+          echo $IOS_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/ios/GoogleService-Info.plist"
       
-      # Step 4: Set version and increment build number based on TestFlight
+      # Step 5: Set version and increment build number based on TestFlight
       - name: Set version and build number
         script: | 
           #!/bin/sh
@@ -139,7 +147,7 @@ workflows:
           echo "Latest build number from App Store: $LATEST_BUILD_NUMBER, setting to: $NEW_BUILD_NUMBER"
           agvtool new-version -all $NEW_BUILD_NUMBER
       
-      # Step 5: Build the iOS app and create an IPA package
+      # Step 6: Build the iOS app and create an IPA package
       - name: Build .ipa for release
         script: |
           xcode-project build-ipa \
