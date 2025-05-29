@@ -115,12 +115,19 @@ export const SignUpScreen = ({ navigation }: any) => {
       />
       <View style={styles.socialButtonsContainer}>
         {Platform.OS === 'ios' && (
-          <AppleButton
-            buttonStyle={AppleButton.Style.WHITE}
-            buttonType={AppleButton.Type.SIGN_IN}
+          <TouchableOpacity
             style={styles.socialButton}
             onPress={() => {/* handleAppleSignIn logic here */}}
-          />
+            disabled={loading}
+            activeOpacity={0.7}
+          >
+            <Image
+              source={require('../../assets/apple-icon.png')}
+              style={styles.socialIcon}
+              resizeMode="contain"
+            />
+            <Text style={styles.socialButtonText}>Sign up with Apple</Text>
+          </TouchableOpacity>
         )}
         <TouchableOpacity
           style={styles.socialButton}
