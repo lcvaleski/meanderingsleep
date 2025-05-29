@@ -39,7 +39,13 @@ workflows:
         script: | 
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
       
-      # Step 4: Build the Android release bundle with auto-incremented version number
+      # Step 4: Decode and write google-services.json
+      - name: Set up Firebase configuration
+        script: |
+          # Decode the base64-encoded google-services.json and write it to the correct location
+          echo $ANDROID_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/android/app/google-services.json"
+      
+      # Step 5: Build the Android release bundle with auto-incremented version number
       - name: Build Android release
         script: | 
           # Fetch the latest build number from Google Play
