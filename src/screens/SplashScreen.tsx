@@ -1,65 +1,129 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { Button } from '../design-system/components/Button';
-import { Logo } from '../design-system/components/Logo';
-import { colors, typography, spacing } from '../design-system/theme';
+
+const { width, height } = Dimensions.get('window');
 
 export const SplashScreen = ({ navigation }: any) => {
   return (
-    <View style={styles.container}>
-      {/* You can use ImageBackground here if you want a background image */}
-      <Logo style={styles.logo} />
-      <Button
-        title="Continue"
-        onPress={() => navigation.navigate('SignUp')}
-        variant="primary"
-        size="large"
-        style={styles.button}
-      />
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Login')}
-        style={styles.loginLink}
-      >
-        <Text style={styles.loginText}>
-          Already have an account? <Text style={styles.loginTextBold}>Log In</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
+    <LinearGradient
+      colors={['#838ACA', '#2E2464']}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={styles.gradient}
+    >
+      {/* Clouds (furthest back) */}
+      <Image source={require('../assets/splash/clouds.png')} style={styles.clouds} />
+      {/* Hills, layered for depth */}
+      <Image source={require('../assets/splash/hill_3.png')} style={styles.hill3} />
+      <Image source={require('../assets/splash/hill_2.png')} style={styles.hill2} />
+      <Image source={require('../assets/splash/hill_1.png')} style={styles.hill1} />
+
+      {/* Centered logo and text */}
+      <View style={styles.centerContent}>
+        <Image source={require('../assets/splash/logo.png')} style={styles.logo} />
+        <Image source={require('../assets/splash/logo_text.png')} style={styles.logoText} />
+      </View>
+      {/* Buttons above the clouds */}
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Continue"
+          onPress={() => navigation.navigate('SignUp')}
+          variant="secondary"
+          size="medium"
+          style={{ width: '75%' }}
+        />
+        <TouchableOpacity style={styles.link} onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.linkText}>Already have an account? Log In</Text>
+        </TouchableOpacity>
+      </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  gradient: {
     flex: 1,
-    backgroundColor: colors.primary.nocturne, // or your splash bg color
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.lg,
+    justifyContent: 'flex-end',
+  },
+  clouds: {
+    position: 'absolute',
+    bottom: 0,
+    width: width,
+    resizeMode: 'cover',
+    zIndex: 0,
+  },
+  hill1: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: width,
+    resizeMode: 'cover',
+    zIndex: 1,
+  },
+  hill2: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: width,
+    resizeMode: 'cover',
+    zIndex: 2,
+
+  },
+  hill3: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: width,
+    resizeMode: 'cover',
+    zIndex: 3,
+
+  },
+  centerContent: {
+    position: 'absolute',
+    top: height * 0.22,
+    width: '100%',
+    alignItems: 'center',
+    zIndex: 10,
   },
   logo: {
-    marginBottom: spacing.xl,
+    width: 75,
+    height: 75,
+    marginBottom: 24,
+    resizeMode: 'contain',
   },
-  headline: {
-    color: colors.primary.white,
-    fontSize: typography.fontSize['2xl'],
-    fontFamily: typography.fontFamily.bold,
-    textAlign: 'center',
-    marginBottom: spacing['2xl'],
+  logoText: {
+    width: 260,
+    height: 48,
+    resizeMode: 'contain',
+  },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: height * 0.4, // just above the clouds
+    width: '100%',
+    alignItems: 'center',
+    zIndex: 20,
   },
   button: {
-    width: '100%',
-    marginBottom: spacing.lg,
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    paddingVertical: 14,
+    paddingHorizontal: 60,
+    marginBottom: 16,
   },
-  loginLink: {
-    alignItems: 'center',
-  },
-  loginText: {
-    color: colors.primary.white,
-    fontSize: typography.fontSize.md,
-    textAlign: 'center',
-  },
-  loginTextBold: {
-    color: colors.primary.orchid, // or your accent color
+  buttonText: {
+    color: '#5B4DB1',
+    fontSize: 18,
     fontWeight: 'bold',
+  },
+  link: {
+    padding: 8,
+  },
+  linkText: {
+    color: '#fff',
+    fontSize: 16,
+    // no underline
   },
 }); 

@@ -69,39 +69,39 @@ export const SignUpScreen = ({ navigation }: any) => {
       <Text style={styles.title}>Create Account</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <View style={styles.formFields}>
-        <View style={styles.fieldGroup}>
-          <Text style={styles.label}>Email<Text style={styles.asterisk}>*</Text></Text>
-          <FormField
-            placeholder="example@email.com"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            editable={!loading}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.fieldGroup}>
-          <Text style={styles.label}>Password<Text style={styles.asterisk}>*</Text></Text>
-          <FormField
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={setPassword}
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Email<Text style={styles.asterisk}>*</Text></Text>
+        <FormField
+          placeholder="example@email.com"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          editable={!loading}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Password<Text style={styles.asterisk}>*</Text></Text>
+        <FormField
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={setPassword}
             secureTextEntry={true}
-            editable={!loading}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.fieldGroup}>
-          <Text style={styles.label}>Confirm Password<Text style={styles.asterisk}>*</Text></Text>
-          <FormField
-            placeholder="Enter your password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
+          editable={!loading}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Confirm Password<Text style={styles.asterisk}>*</Text></Text>
+        <FormField
+          placeholder="Enter your password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
             secureTextEntry={true}
-            editable={!loading}
-            style={styles.input}
-          />
+          editable={!loading}
+          style={styles.input}
+        />
         </View>
       </View>
       <Button

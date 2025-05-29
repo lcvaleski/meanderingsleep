@@ -89,25 +89,25 @@ export const LoginScreen = ({ navigation }: any) => {
       <Text style={styles.title}>Login</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <View style={styles.formFields}>
-        <FormField
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          editable={!loading}
-          style={styles.input}
-        />
-        <FormField
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
+      <FormField
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        editable={!loading}
+        style={styles.input}
+      />
+      <FormField
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
           secureTextEntry={true}
-          editable={!loading}
-          style={styles.input}
-        />
+        editable={!loading}
+        style={styles.input}
+      />
         <TouchableOpacity
-          onPress={() => navigation.navigate('ForgotPassword')}
+        onPress={() => navigation.navigate('ForgotPassword')}
           style={styles.forgotPasswordLink}
         >
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
@@ -128,10 +128,10 @@ export const LoginScreen = ({ navigation }: any) => {
         <View style={styles.dividerLine} />
       </View>
       <View style={styles.socialButtonsContainer}>
-        {Platform.OS === 'ios' && (
+      {Platform.OS === 'ios' && (
           <TouchableOpacity
             style={styles.socialButton}
-            onPress={handleAppleSignIn}
+          onPress={handleAppleSignIn}
             disabled={loading}
             activeOpacity={0.7}
           >
