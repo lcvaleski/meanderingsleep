@@ -6,6 +6,7 @@ module.exports = {
   setupFiles: ['./jest/setup.js'],
   moduleNameMapper: {
     '^@react-native-google-signin/google-signin$': '<rootDir>/__mocks__/@react-native-google-signin/google-signin.js',
-    '^@invertase/react-native-apple-authentication$': '<rootDir>/__mocks__/@invertase/react-native-apple-authentication.js'
+    '^@invertase/react-native-apple-authentication$': '<rootDir>/__mocks__/@invertase/react-native-apple-authentication.js',
+    '^react-native-linear-gradient$': '<rootDir>/__mocks__/react-native-linear-gradient.js'
   }
 };
