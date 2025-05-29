@@ -18,6 +18,14 @@ export const SignUpScreen = ({ navigation }: any) => {
   const [error, setError] = useState('');
   const { signUp, loading } = useAuth();
 
+  const isFormValid =
+    !!email &&
+    !!password &&
+    !!confirmPassword &&
+    validateEmail(email) &&
+    password.length >= 6 &&
+    password === confirmPassword;
+
   const handleSignUp = async () => {
     setError('');
     if (!email || !password || !confirmPassword) {
@@ -99,7 +107,8 @@ export const SignUpScreen = ({ navigation }: any) => {
         variant="primary"
         size="large"
         loading={loading}
-        style={styles.button}
+        style={{ width: '100%' }}
+        disabled={!isFormValid || loading}
       />
       <TouchableOpacity
         onPress={() => navigation.navigate('Login')}

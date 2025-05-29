@@ -19,6 +19,8 @@ export const LoginScreen = ({ navigation }: any) => {
   const [error, setError] = useState('');
   const { signIn, signInWithGoogle, loading } = useAuth();
 
+  const isFormValid = !!email && !!password && validateEmail(email);
+
   const handleLogin = async () => {
     setError('');
     if (!email || !password) {
@@ -116,7 +118,8 @@ export const LoginScreen = ({ navigation }: any) => {
         variant="primary"
         size="large"
         loading={loading}
-        style={styles.loginButton}
+        style={{ width: '100%' }}
+        disabled={!isFormValid || loading}
       />
       <View style={styles.divider}>
         <View style={styles.dividerLine} />
