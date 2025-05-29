@@ -54,11 +54,11 @@ export const Button: React.FC<ButtonProps> = ({
   const getPadding = () => {
     switch (size) {
       case 'small':
-        return spacing.md;
+        return 8;
       case 'large':
-        return spacing.xl;
+        return 14;
       default:
-        return spacing.lg;
+        return 10;
     }
   };
 
