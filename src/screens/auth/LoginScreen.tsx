@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Image } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
 import auth from '@react-native-firebase/auth';
@@ -88,30 +88,31 @@ export const LoginScreen = ({ navigation }: any) => {
       <Logo />
       <Text style={styles.title}>Login</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <FormField
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        editable={!loading}
-        style={styles.input}
-      />
-      <FormField
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={true}
-        editable={!loading}
-        style={styles.input}
-      />
-      <Button
-        title="Forgot Password?"
-        onPress={() => navigation.navigate('ForgotPassword')}
-        variant="secondary"
-        size="small"
-        style={styles.forgotPassword}
-      />
+      <View style={styles.formFields}>
+        <FormField
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          editable={!loading}
+          style={styles.input}
+        />
+        <FormField
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={true}
+          editable={!loading}
+          style={styles.input}
+        />
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ForgotPassword')}
+          style={styles.forgotPasswordLink}
+        >
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
+      </View>
       <Button
         title="Login"
         onPress={handleLogin}
@@ -126,30 +127,38 @@ export const LoginScreen = ({ navigation }: any) => {
         <Text style={styles.dividerText}>OR</Text>
         <View style={styles.dividerLine} />
       </View>
-      <Button
-        title="Sign in with Google"
-        onPress={handleGoogleSignIn}
-        variant="secondary"
-        size="large"
-        disabled={loading}
-        style={styles.googleButton}
-      />
-      {Platform.OS === 'ios' && (
-        <AppleButton
-          buttonStyle={AppleButton.Style.BLACK}
-          buttonType={AppleButton.Type.SIGN_IN}
-          style={styles.appleButton}
-          onPress={handleAppleSignIn}
-        />
-      )}
-      <Button
-        title="Don't have an account? Sign Up"
+      <View style={styles.socialButtonsContainer}>
+        {Platform.OS === 'ios' && (
+          <AppleButton
+            buttonStyle={AppleButton.Style.WHITE}
+            buttonType={AppleButton.Type.SIGN_IN}
+            style={styles.socialButton}
+            onPress={handleAppleSignIn}
+          />
+        )}
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleGoogleSignIn}
+          disabled={loading}
+          activeOpacity={0.7}
+        >
+          <Image
+            source={require('../../assets/google-icon.png')}
+            style={styles.socialIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.socialButtonText}>Sign in with Google</Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity
         onPress={() => navigation.navigate('SignUp')}
-        variant="secondary"
-        size="small"
+        style={styles.signUpLink}
         disabled={loading}
-        style={styles.signUpButton}
-      />
+      >
+        <Text style={styles.signUpText}>
+          Don't have an account? <Text style={styles.signUpTextBold}>Sign Up</Text>
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -175,11 +184,34 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginBottom: spacing.md,
   },
+  forgotPasswordLink: {
+    alignSelf: 'flex-end',
+    marginBottom: spacing.md,
+  },
+  forgotPasswordText: {
+    color: colors.primary.orchid,
+    fontSize: typography.fontSize.sm,
+    textDecorationLine: 'underline',
+    fontFamily: typography.fontFamily.medium,
+  },
   loginButton: {
     marginTop: spacing.sm,
   },
   signUpButton: {
     marginTop: spacing.lg,
+  },
+  signUpLink: {
+    alignItems: 'center',
+    marginTop: spacing.lg,
+  },
+  signUpText: {
+    color: colors.primary.white,
+    fontSize: typography.fontSize.md,
+    textAlign: 'center',
+  },
+  signUpTextBold: {
+    color: colors.primary.orchid,
+    fontWeight: 'bold',
   },
   errorText: {
     color: colors.secondary.coral,
@@ -204,12 +236,39 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.medium,
     fontSize: typography.fontSize.sm,
   },
-  googleButton: {
-    marginBottom: spacing.sm,
-  },
-  appleButton: {
+  formFields: {
+    marginBottom: spacing.lg,
     width: '100%',
-    height: 44,
-    marginTop: spacing.sm,
+  },
+  socialButtonsContainer: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.lg,
+    width: '100%',
+  },
+  socialButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: spacing.md,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
+  },
+  socialButtonText: {
+    color: '#222',
+    fontSize: 16,
+    fontWeight: '500',
   },
 }); 

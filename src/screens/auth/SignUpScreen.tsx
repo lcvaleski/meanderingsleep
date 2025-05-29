@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../design-system/components/Button';
 import { FormField } from '../../design-system/components/FormField';
 import { Logo } from '../../design-system/components/Logo';
 import { colors, typography, spacing } from '../../design-system/theme';
+import { AppleButton } from '@invertase/react-native-apple-authentication';
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,7 +17,7 @@ export const SignUpScreen = ({ navigation }: any) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const { signUp, loading } = useAuth();
+  const { signUp, loading, signInWithGoogle } = useAuth();
 
   const isFormValid =
     !!email &&
@@ -67,39 +68,41 @@ export const SignUpScreen = ({ navigation }: any) => {
       <Logo />
       <Text style={styles.title}>Create Account</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Email<Text style={styles.asterisk}>*</Text></Text>
-        <FormField
-          placeholder="example@email.com"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          editable={!loading}
-          style={styles.input}
-        />
-      </View>
-      <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Password<Text style={styles.asterisk}>*</Text></Text>
-        <FormField
-          placeholder="Enter your password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={true}
-          editable={!loading}
-          style={styles.input}
-        />
-      </View>
-      <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Confirm Password<Text style={styles.asterisk}>*</Text></Text>
-        <FormField
-          placeholder="Enter your password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry={true}
-          editable={!loading}
-          style={styles.input}
-        />
+      <View style={styles.formFields}>
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>Email<Text style={styles.asterisk}>*</Text></Text>
+          <FormField
+            placeholder="example@email.com"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            editable={!loading}
+            style={styles.input}
+          />
+        </View>
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>Password<Text style={styles.asterisk}>*</Text></Text>
+          <FormField
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
+            editable={!loading}
+            style={styles.input}
+          />
+        </View>
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>Confirm Password<Text style={styles.asterisk}>*</Text></Text>
+          <FormField
+            placeholder="Enter your password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={true}
+            editable={!loading}
+            style={styles.input}
+          />
+        </View>
       </View>
       <Button
         title="Sign Up"
@@ -110,6 +113,29 @@ export const SignUpScreen = ({ navigation }: any) => {
         style={{ width: '100%' }}
         disabled={!isFormValid || loading}
       />
+      <View style={styles.socialButtonsContainer}>
+        {Platform.OS === 'ios' && (
+          <AppleButton
+            buttonStyle={AppleButton.Style.WHITE}
+            buttonType={AppleButton.Type.SIGN_IN}
+            style={styles.socialButton}
+            onPress={() => {/* handleAppleSignIn logic here */}}
+          />
+        )}
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={signInWithGoogle}
+          disabled={loading}
+          activeOpacity={0.7}
+        >
+          <Image
+            source={require('../../assets/google-icon.png')}
+            style={styles.socialIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.socialButtonText}>Sign up with Google</Text>
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity
         onPress={() => navigation.navigate('Login')}
         disabled={loading}
@@ -183,5 +209,40 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: typography.fontFamily.regular,
     fontSize: typography.fontSize.sm,
+  },
+  formFields: {
+    marginBottom: spacing.lg,
+    width: '100%',
+  },
+  socialButtonsContainer: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.lg,
+    width: '100%',
+  },
+  socialButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: spacing.md,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
+  },
+  socialButtonText: {
+    color: '#222',
+    fontSize: 16,
+    fontWeight: '500',
   },
 }); 
