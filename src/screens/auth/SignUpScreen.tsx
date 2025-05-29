@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../design-system/components/Button';
 import { FormField } from '../../design-system/components/FormField';
+import { Logo } from '../../design-system/components/Logo';
 import { colors, typography, spacing } from '../../design-system/theme';
 
 const validateEmail = (email: string) => {
@@ -57,10 +58,7 @@ export const SignUpScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      {/* Logo Placeholder */}
-      <View style={styles.logoContainer}>
-        <Text style={styles.logo}>💤</Text>
-      </View>
+      <Logo />
       <Text style={styles.title}>Create Account</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <View style={styles.fieldGroup}>

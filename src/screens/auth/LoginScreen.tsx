@@ -5,6 +5,7 @@ import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentica
 import auth from '@react-native-firebase/auth';
 import { Button } from '../../design-system/components/Button';
 import { FormField } from '../../design-system/components/FormField';
+import { Logo } from '../../design-system/components/Logo';
 import { colors, typography, spacing } from '../../design-system/theme';
 
 const validateEmail = (email: string) => {
@@ -83,7 +84,8 @@ export const LoginScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
+      <Logo />
+      <Text style={styles.title}>Login</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <FormField
         placeholder="Email"
