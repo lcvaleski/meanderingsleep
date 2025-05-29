@@ -20,7 +20,7 @@ workflows:
       # Custom environment variables for this workflow
       vars:
         PACKAGE_NAME: "net.coventry.sleepless"  # Android application ID
-        APP_VERSION: "0.2.3"  # Application version number (semver)
+        APP_VERSION: "0.2.4"  # Application version number (semver)
     
     scripts:
       # Step 1: Install all JavaScript dependencies from package.json
