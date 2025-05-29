@@ -18,7 +18,6 @@ export const LoginScreen = ({ navigation }: any) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { signIn, signInWithGoogle, loading } = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     setError('');
@@ -100,9 +99,8 @@ export const LoginScreen = ({ navigation }: any) => {
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry={!showPassword}
+        secureTextEntry={true}
         editable={!loading}
-        icon={<Text onPress={() => setShowPassword(v => !v)} style={{color: colors.primary.white}}>{showPassword ? '🙈' : '👁️'}</Text>}
         style={styles.input}
       />
       <Button

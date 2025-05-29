@@ -17,8 +17,6 @@ export const SignUpScreen = ({ navigation }: any) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const { signUp, loading } = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSignUp = async () => {
     setError('');
@@ -79,9 +77,8 @@ export const SignUpScreen = ({ navigation }: any) => {
           placeholder="Enter your password"
           value={password}
           onChangeText={setPassword}
-          secureTextEntry={!showPassword}
+          secureTextEntry={true}
           editable={!loading}
-          icon={<Text onPress={() => setShowPassword(v => !v)} style={{color: colors.primary.white}}>{showPassword ? '🙈' : '👁️'}</Text>}
           style={styles.input}
         />
       </View>
@@ -91,9 +88,8 @@ export const SignUpScreen = ({ navigation }: any) => {
           placeholder="Enter your password"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          secureTextEntry={!showConfirmPassword}
+          secureTextEntry={true}
           editable={!loading}
-          icon={<Text onPress={() => setShowConfirmPassword(v => !v)} style={{color: colors.primary.white}}>{showConfirmPassword ? '🙈' : '👁️'}</Text>}
           style={styles.input}
         />
       </View>
