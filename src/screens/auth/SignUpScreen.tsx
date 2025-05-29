@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+import { Button } from '../../design-system/components/Button';
+import { FormField } from '../../design-system/components/FormField';
+import { Logo } from '../../design-system/components/Logo';
+import { colors, typography, spacing } from '../../design-system/theme';
+import { AppleButton } from '@invertase/react-native-apple-authentication';
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,7 +17,15 @@ export const SignUpScreen = ({ navigation }: any) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const { signUp, loading } = useAuth();
+  const { signUp, loading, signInWithGoogle } = useAuth();
+
+  const isFormValid =
+    !!email &&
+    !!password &&
+    !!confirmPassword &&
+    validateEmail(email) &&
+    password.length >= 6 &&
+    password === confirmPassword;
 
   const handleSignUp = async () => {
     setError('');
@@ -60,49 +65,90 @@ export const SignUpScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
+      <Logo />
       <Text style={styles.title}>Create Account</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
-      <TouchableOpacity
-        style={[styles.button, loading && { opacity: 0.6 }]}
+      <View style={styles.formFields}>
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Email<Text style={styles.asterisk}>*</Text></Text>
+        <FormField
+          placeholder="example@email.com"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          editable={!loading}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Password<Text style={styles.asterisk}>*</Text></Text>
+        <FormField
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={setPassword}
+            secureTextEntry={true}
+          editable={!loading}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Confirm Password<Text style={styles.asterisk}>*</Text></Text>
+        <FormField
+          placeholder="Enter your password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+            secureTextEntry={true}
+          editable={!loading}
+          style={styles.input}
+        />
+        </View>
+      </View>
+      <Button
+        title="Sign Up"
         onPress={handleSignUp}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Sign Up</Text>
+        variant="primary"
+        size="large"
+        loading={loading}
+        style={{ width: '100%' }}
+        disabled={!isFormValid || loading}
+      />
+      <View style={styles.socialButtonsContainer}>
+        {Platform.OS === 'ios' && (
+          <TouchableOpacity
+            style={styles.socialButton}
+            onPress={() => {/* handleAppleSignIn logic here */}}
+            disabled={loading}
+            activeOpacity={0.7}
+          >
+            <Image
+              source={require('../../assets/apple-icon.png')}
+              style={styles.socialIcon}
+              resizeMode="contain"
+            />
+            <Text style={styles.socialButtonText}>Sign up with Apple</Text>
+          </TouchableOpacity>
         )}
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={signInWithGoogle}
+          disabled={loading}
+          activeOpacity={0.7}
+        >
+          <Image
+            source={require('../../assets/google-icon.png')}
+            style={styles.socialIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.socialButtonText}>Sign up with Google</Text>
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity
-        style={styles.loginLink}
         onPress={() => navigation.navigate('Login')}
         disabled={loading}
+        style={styles.loginLink}
       >
-        <Text style={styles.loginText}>
-          Already have an account? <Text style={styles.loginTextBold}>Login</Text>
-        </Text>
+        <Text style={styles.loginText}>Already have an account? <Text style={styles.loginTextBold}>Login</Text></Text>
       </TouchableOpacity>
     </View>
   );
@@ -111,53 +157,99 @@ export const SignUpScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.primary.eclipse,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+    marginTop: spacing.xl,
+  },
+  logo: {
+    fontSize: 48,
+    color: colors.primary.white,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 30,
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.bold,
+    marginBottom: spacing.xl,
     textAlign: 'center',
+    color: colors.primary.white,
+  },
+  fieldGroup: {
+    marginBottom: spacing.md,
+  },
+  label: {
+    color: colors.primary.white,
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.fontSize.md,
+    marginBottom: spacing.xs,
+  },
+  asterisk: {
+    color: colors.primary.orchid,
+    fontSize: typography.fontSize.md,
   },
   input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    fontSize: 16,
+    marginBottom: 0,
   },
   button: {
-    backgroundColor: '#007AFF',
-    height: 50,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 15,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: spacing.xl,
+    marginBottom: spacing.md,
   },
   loginLink: {
-    marginTop: 20,
     alignItems: 'center',
+    marginTop: 0,
   },
   loginText: {
-    fontSize: 14,
-    color: '#666',
+    color: colors.primary.white,
+    fontSize: typography.fontSize.md,
+    textAlign: 'center',
   },
   loginTextBold: {
-    color: '#007AFF',
+    color: colors.primary.white,
     fontWeight: 'bold',
   },
   errorText: {
-    color: 'red',
-    marginBottom: 10,
+    color: colors.secondary.coral,
+    marginBottom: spacing.sm,
     textAlign: 'center',
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.sm,
+  },
+  formFields: {
+    marginBottom: spacing.lg,
+    width: '100%',
+  },
+  socialButtonsContainer: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.lg,
+    width: '100%',
+  },
+  socialButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: spacing.md,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
+  },
+  socialButtonText: {
+    color: '#222',
+    fontSize: 16,
+    fontWeight: '500',
   },
 }); 

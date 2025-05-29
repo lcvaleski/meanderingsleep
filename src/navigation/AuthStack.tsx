@@ -5,8 +5,10 @@ import { SignUpScreen } from '../screens/auth/SignUpScreen';
 import { ForgotPasswordScreen } from '../screens/auth/ForgotPasswordScreen';
 import { AuthLoadingScreen } from '../screens/auth/AuthLoadingScreen';
 import { MainScreen } from '../screens/MainScreen';
+import { SplashScreen } from '../screens/SplashScreen';
 
 export type AuthStackParamList = {
+  Splash: undefined;
   AuthLoading: undefined;
   Login: undefined;
   SignUp: undefined;
@@ -19,10 +21,12 @@ const Stack = createStackNavigator<AuthStackParamList>();
 export const AuthStack = () => {
   return (
     <Stack.Navigator
+      initialRouteName="Splash"
       screenOptions={{
         headerShown: false,
       }}
     >
+      <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="AuthLoading" component={AuthLoadingScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />

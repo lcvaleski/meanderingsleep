@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
+import { Button } from '../design-system/components/Button';
+import { colors, typography, spacing } from '../design-system/theme';
 
 export const MainScreen = ({ navigation }: any) => {
   const { user, logout } = useAuth();
@@ -13,9 +15,12 @@ export const MainScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
       <Text style={styles.welcomeText}>Welcome, {user?.email}</Text>
-      <TouchableOpacity style={styles.button} onPress={handleLogout}>
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
+      <Button
+        title="Logout"
+        onPress={handleLogout}
+        variant="primary"
+        size="large"
+      />
     </View>
   );
 };
@@ -25,23 +30,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: spacing.lg,
+    backgroundColor: colors.background.default,
   },
   welcomeText: {
-    fontSize: 20,
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
-    width: '100%',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: typography.fontSize.xl,
+    marginBottom: spacing.lg,
+    fontFamily: typography.fontFamily.medium,
+    color: colors.neutral.gray900,
   },
 }); 

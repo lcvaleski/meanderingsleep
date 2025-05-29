@@ -20,7 +20,7 @@ workflows:
       # Custom environment variables for this workflow
       vars:
         PACKAGE_NAME: "net.coventry.sleepless"  # Android application ID
-        APP_VERSION: "0.2.2"  # Application version number (semver)
+        APP_VERSION: "0.2.3"  # Application version number (semver)
     
     scripts:
       # Step 1: Install all JavaScript dependencies from package.json
@@ -39,7 +39,13 @@ workflows:
         script: | 
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
       
-      # Step 4: Build the Android release bundle with auto-incremented version number
+      # Step 4: Decode and write google-services.json
+      - name: Set up Firebase configuration
+        script: |
+          # Decode the base64-encoded google-services.json and write it to the correct location
+          echo $ANDROID_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/android/app/google-services.json"
+      
+      # Step 5: Build the Android release bundle with auto-incremented version number
       - name: Build Android release
         script: | 
           # Fetch the latest build number from Google Play
@@ -85,6 +91,10 @@ workflows:
       app_store_connect: codemagic  # Uses App Store Connect API key named 'codemagic'
     
     environment:
+
+      groups:
+        - google_credentials  # Contains Google Play API access credentials
+
       # iOS code signing configuration for App Store distribution
       ios_signing:
         distribution_type: app_store  # Type of distribution
@@ -95,7 +105,7 @@ workflows:
         XCODE_WORKSPACE: "meanderingsleep.xcworkspace"  # Xcode workspace file name
         XCODE_SCHEME: "meanderingsleep"  # Xcode build scheme name
         APP_STORE_APPLE_ID: 6502964632  # App's unique identifier in App Store Connect
-        APP_VERSION: "0.2.2"  # Application version number (semver)
+        APP_VERSION: "0.2.3"  # Application version number (semver)
     
     scripts:
       # Step 1: Install all dependencies (JS and native iOS through CocoaPods)
@@ -115,9 +125,13 @@ workflows:
         script: |
           xcode-project use-profiles
       
-
+      # Step 4: Set up Firebase configuration for iOS
+      - name: Set up Firebase configuration
+        script: |
+          # Decode the base64-encoded GoogleService-Info.plist and write it to the correct location
+          echo $IOS_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/ios/GoogleService-Info.plist"
       
-      # Step 4: Set version and increment build number based on TestFlight
+      # Step 5: Set version and increment build number based on TestFlight
       - name: Set version and build number
         script: | 
           #!/bin/sh
@@ -133,7 +147,7 @@ workflows:
           echo "Latest build number from App Store: $LATEST_BUILD_NUMBER, setting to: $NEW_BUILD_NUMBER"
           agvtool new-version -all $NEW_BUILD_NUMBER
       
-      # Step 5: Build the iOS app and create an IPA package
+      # Step 6: Build the iOS app and create an IPA package
       - name: Build .ipa for release
         script: |
           xcode-project build-ipa \
