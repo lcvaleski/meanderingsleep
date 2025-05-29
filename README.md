@@ -4,6 +4,8 @@ This is the refactor of Meandering Sleep to react-native from Flutter. CI/CD is 
 
 Do all feature development on branch `dev`. When done, test. After this, submit a PR for `main` and then build iOS/Android in Codemagic.
 
+**Note:** Before building in Codemagic, you must bump the version of `APP_VERSION` in `codemagic.yaml`
+
 # Setup
 
 - Clone the repo
