@@ -13,6 +13,8 @@ Do all feature development on branch `dev`. When done, test. After this, submit 
 - Go to the Firebase project `sleepless-6bce2` and download:
     * `GoogleService-Info.plist`, add this to the `ios` dir.
     * `google-services.json`, add this to the `/android/app/` dir.
+- Make sure you have the path of your Android SDK setup in `~/.zshrc`:
+    Ex. `export ANDROID_HOME=$HOME/Library/Android/sdk`
 
 # Testing
 
