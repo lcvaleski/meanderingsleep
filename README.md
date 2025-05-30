@@ -10,7 +10,7 @@ Do all feature development on branch `dev`. When done, test. After this, submit 
 
 - Clone the repo
 - `npm install`
-- Go to the Firebase project and download:
+- Go to the Firebase `sleeples` project and download:
     * `GoogleService-Info.plist`, add this to the `ios` dir.
     * `google-services.json`, add this to the `/android/app/` dir.
 
