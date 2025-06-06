@@ -10,12 +10,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { AuthStack } from './src/navigation/AuthStack';
 import { ThemeProvider } from './src/design-system/ThemeProvider';
-import { setupPlayer } from './src/services/TrackPlayerService';
 import TrackPlayer from 'react-native-track-player';
 
 const App = () => {
   useEffect(() => {
-    setupPlayer();
+    (async () => {
+      await TrackPlayer.setupPlayer();
+    })();
   }, []);
 
   return (
