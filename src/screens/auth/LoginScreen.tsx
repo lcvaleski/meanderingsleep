@@ -1,16 +1,126 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Image } from 'react-native';
+// import { useAuth } from '../../contexts/AuthContext';
+// import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
+// import auth from '@react-native-firebase/auth';
 import { Button } from '../../design-system/components/Button';
+import { FormField } from '../../design-system/components/FormField';
+import { Logo } from '../../design-system/components/Logo';
+import { colors, typography, spacing } from '../../design-system/theme';
+
+const validateEmail = (email: string) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
 
 export const LoginScreen = ({ navigation }: any) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  // const { signIn, signInWithGoogle, loading } = useAuth();
+  const loading = false; // Placeholder
+
+  const isFormValid = !!email && !!password && validateEmail(email);
+
+  const handleLogin = async () => {
+    // Placeholder function
+    console.log('Logging in with:', email, password);
+    navigation.navigate('Main'); // Placeholder navigation
+  };
+
+  const handleGoogleSignIn = async () => {
+    // Placeholder function
+    console.log('Signing in with Google');
+  };
+
+  const handleAppleSignIn = async () => {
+    // Placeholder function
+    console.log('Signing in with Apple');
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login Screen</Text>
-      <Button
-        title="Go to Sign Up (placeholder)"
-        onPress={() => navigation.navigate('SignUp')}
-        variant="primary"
+      <Logo />
+      <Text style={styles.title}>Login</Text>
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      <View style={styles.formFields}>
+      <FormField
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        editable={!loading}
+        style={styles.input}
       />
+      <FormField
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+          secureTextEntry={true}
+        editable={!loading}
+        style={styles.input}
+      />
+        <TouchableOpacity
+        onPress={() => navigation.navigate('ForgotPassword')}
+          style={styles.forgotPasswordLink}
+        >
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
+      </View>
+      <Button
+        title="Login"
+        onPress={handleLogin}
+        variant="primary"
+        size="large"
+        loading={loading}
+        style={{ width: '100%' }}
+        disabled={!isFormValid || loading}
+      />
+      <View style={styles.divider}>
+        <View style={styles.dividerLine} />
+        <Text style={styles.dividerText}>OR</Text>
+        <View style={styles.dividerLine} />
+      </View>
+      <View style={styles.socialButtonsContainer}>
+      {Platform.OS === 'ios' && (
+          <TouchableOpacity
+            style={styles.socialButton}
+          onPress={handleAppleSignIn}
+            disabled={loading}
+            activeOpacity={0.7}
+          >
+            <Image
+              source={require('../../../assets/apple-icon.png')}
+              style={styles.socialIcon}
+              resizeMode="contain"
+            />
+            <Text style={styles.socialButtonText}>Sign in with Apple</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleGoogleSignIn}
+          disabled={loading}
+          activeOpacity={0.7}
+        >
+          <Image
+            source={require('../../../assets/google-icon.png')}
+            style={styles.socialIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.socialButtonText}>Sign in with Google</Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('SignUp')}
+        style={styles.signUpLink}
+        disabled={loading}
+      >
+        <Text style={styles.signUpText}>
+          Don't have an account? <Text style={styles.signUpTextBold}>Sign Up</Text>
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -18,14 +128,94 @@ export const LoginScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: spacing.lg,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#2E2464', // Matching the splash screen theme
+    backgroundColor: colors.primary.nocturne,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 20,
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.bold,
+    marginBottom: spacing.xl,
+    textAlign: 'center',
+    color: colors.primary.white,
   },
-}); 
+  input: {
+    marginBottom: spacing.md,
+  },
+  forgotPasswordLink: {
+    alignSelf: 'flex-end',
+    marginBottom: spacing.md,
+  },
+  forgotPasswordText: {
+    color: colors.primary.orchid,
+    fontSize: typography.fontSize.sm,
+    textDecorationLine: 'underline',
+    fontFamily: typography.fontFamily.medium,
+  },
+  signUpLink: {
+    alignItems: 'center',
+    marginTop: spacing.lg,
+  },
+  signUpText: {
+    color: colors.primary.white,
+    fontSize: typography.fontSize.md,
+    textAlign: 'center',
+  },
+  signUpTextBold: {
+    color: colors.primary.orchid,
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: colors.secondary.coral,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.sm,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: spacing.lg,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.primary.blueberry,
+  },
+  dividerText: {
+    marginHorizontal: spacing.sm,
+    color: colors.primary.white,
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.fontSize.sm,
+  },
+  formFields: {
+    marginBottom: spacing.lg,
+    width: '100%',
+  },
+  socialButtonsContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  socialButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary.blueberry_dark,
+    borderRadius: 24,
+    paddingVertical: 12,
+    width: '90%',
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.primary.blueberry,
+  },
+  socialIcon: {
+    width: 20,
+    height: 20,
+    marginRight: spacing.md,
+  },
+  socialButtonText: {
+    color: colors.primary.white,
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.bold,
+  },
+});
