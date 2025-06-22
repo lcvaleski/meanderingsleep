@@ -3,8 +3,8 @@
  ************************************************/
 import { AppRegistry } from 'react-native';
 import App from './App';
-import TrackPlayer from 'react-native-track-player';
-import { PlaybackService } from './services';
+// import TrackPlayer from 'react-native-track-player';
+// import { PlaybackService } from './services';
 import 'mux.js';
 
 /******************************************
@@ -42,4 +42,4 @@ AppRegistry.runApplication(appName, {
   rootTag: document.getElementById('root'),
 });
 
-TrackPlayer.registerPlaybackService(() => PlaybackService);
+// TrackPlayer.registerPlaybackService(() => PlaybackService);
