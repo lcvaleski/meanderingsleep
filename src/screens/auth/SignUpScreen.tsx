@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
-// import { useAuth } from '../../contexts/AuthContext';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Alert } from 'react-native';
+import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../design-system/components/Button';
 import { FormField } from '../../design-system/components/FormField';
 import { Logo } from '../../design-system/components/Logo';
@@ -17,8 +17,8 @@ export const SignUpScreen = ({ navigation }: any) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  // const { signUp, loading, signInWithGoogle } = useAuth();
-  const loading = false; // Placeholder
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useAuth();
 
   const isFormValid =
     !!email &&
@@ -29,8 +29,17 @@ export const SignUpScreen = ({ navigation }: any) => {
     password === confirmPassword;
 
   const handleSignUp = async () => {
-    // Placeholder
-    console.log('Signing up with:', email, password);
+    setError('');
+    setLoading(true);
+    try {
+      await signUp(email, password);
+      // Navigation will be handled by auth state change
+    } catch (err: any) {
+      setError(err.message || 'Failed to create account');
+      Alert.alert('Sign Up Error', err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleSignIn = async () => {

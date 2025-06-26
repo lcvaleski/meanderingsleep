@@ -1,23 +1,33 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
-// import { getAuth, sendPasswordResetEmail } from '@react-native-firebase/auth';
+import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../design-system/components/Button';
 import { FormField } from '../../design-system/components/FormField';
 import { colors, typography, spacing } from '../../design-system/theme';
 
 export const ForgotPasswordScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { resetPassword } = useAuth();
 
   const handleResetPassword = async () => {
-    // Placeholder logic
-    if (email) {
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email address.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await resetPassword(email);
       Alert.alert(
         'Success',
         'Password reset email sent. Please check your inbox.',
         [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
       );
-    } else {
-      Alert.alert('Error', 'Please enter your email address.');
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'Failed to send reset email');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,6 +44,7 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
         autoCapitalize="none"
         keyboardType="email-address"
         style={styles.input}
+        editable={!loading}
       />
       <Button
         title="Send Reset Link"
@@ -41,6 +52,8 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
         variant="primary"
         size="large"
         style={styles.button}
+        loading={loading}
+        disabled={!email || loading}
       />
       <Button
         title="Back to Login"

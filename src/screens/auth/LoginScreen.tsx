@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, Image } from 'react-native';
-// import { useAuth } from '../../contexts/AuthContext';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
+import { useAuth } from '../../contexts/AuthContext';
 // import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
 // import auth from '@react-native-firebase/auth';
 import { Button } from '../../design-system/components/Button';
@@ -13,19 +13,27 @@ const validateEmail = (email: string) => {
   return re.test(email);
 };
 
-export const LoginScreen = ({ navigation }: any) => {
+export const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  // const { signIn, signInWithGoogle, loading } = useAuth();
-  const loading = false; // Placeholder
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
 
   const isFormValid = !!email && !!password && validateEmail(email);
 
   const handleLogin = async () => {
-    // Placeholder function
-    console.log('Logging in with:', email, password);
-    navigation.navigate('Main'); // Placeholder navigation
+    setError('');
+    setLoading(true);
+    try {
+      await signIn(email, password);
+      // Navigation will be handled by auth state change
+    } catch (err: any) {
+      setError(err.message || 'Failed to login');
+      Alert.alert('Login Error', err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleSignIn = async () => {
@@ -39,7 +47,11 @@ export const LoginScreen = ({ navigation }: any) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView 
+      style={styles.scrollView}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
       <Logo />
       <Text style={styles.title}>Login</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -62,7 +74,7 @@ export const LoginScreen = ({ navigation }: any) => {
         style={styles.input}
       />
         <TouchableOpacity
-        onPress={() => navigation.navigate('ForgotPassword')}
+        onPress={() => console.log('Navigate to forgot password')}
           style={styles.forgotPasswordLink}
         >
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
@@ -113,7 +125,7 @@ export const LoginScreen = ({ navigation }: any) => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        onPress={() => navigation.navigate('SignUp')}
+        onPress={() => console.log('Navigate to sign up')}
         style={styles.signUpLink}
         disabled={loading}
       >
@@ -121,16 +133,19 @@ export const LoginScreen = ({ navigation }: any) => {
           Don't have an account? <Text style={styles.signUpTextBold}>Sign Up</Text>
         </Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
     flex: 1,
+    backgroundColor: colors.primary.nocturne,
+  },
+  container: {
+    flexGrow: 1,
     padding: spacing.lg,
     justifyContent: 'center',
-    backgroundColor: colors.primary.nocturne,
   },
   title: {
     fontSize: typography.fontSize['2xl'],
@@ -200,7 +215,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primary.blueberry_dark,
+    backgroundColor: colors.primary.blueberry,
     borderRadius: 24,
     paddingVertical: 12,
     width: '90%',

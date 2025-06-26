@@ -1,0 +1,26 @@
+diff --git a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStack.kt b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStack.kt
+index 1111111..2222222 100644
+--- a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStack.kt
++++ b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStack.kt
+@@ -297,7 +297,7 @@ class ScreenStack(context: Context?) : ScreenContainer(context) {
+             }
+         }
+         reverseDrawingOrder.forEach { child ->
+-            super.drawChild(canvas, child, drawingTime)
++            super.drawChild(canvas!!, child, drawingTime)
+         }
+         if (drawingOp != null) {
+             drawingOpPool.add(drawingOp)
+diff --git a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt
+index 1111111..2222222 100644
+--- a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt
++++ b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt
+@@ -390,7 +390,7 @@ class ScreenStackHeaderConfig(context: Context) : ViewGroup(context) {
+             // action bar from the current theme. We want to get the default to check if we should
+             // use dark icons or not. The only way to get the default value is to obtain it from
+             // the theme.
+-            val defaultTitleTextColor = TypedValue().also { tv ->
++            val defaultTitleTextColor = TypedValue().also { tv -> 
+                 context.theme.resolveAttribute(android.R.attr.textColorPrimary, tv, true)
+             }.data
+             val titleTextColor = titleTextColor ?: defaultTitleTextColor

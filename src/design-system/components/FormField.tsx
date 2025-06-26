@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TextInputProps, TouchableOpacity } from 'react-native';
+import { View, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import { colors, spacing, typography } from '../theme';
 
 interface FormFieldProps extends TextInputProps {
@@ -18,7 +18,7 @@ export const FormField: React.FC<FormFieldProps> = ({ icon, style, ...props }) =
         onBlur={() => setIsFocused(false)}
         {...props}
       />
-      {icon ? <TouchableOpacity style={styles.icon}>{icon}</TouchableOpacity> : null}
+      {icon ? <View style={styles.icon}>{icon}</View> : null}
     </View>
   );
 };
