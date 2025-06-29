@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import { spacing } from '../theme';
+import { spacing } from './src/design-system/theme';
 
 interface LogoProps {
   size?: number;
