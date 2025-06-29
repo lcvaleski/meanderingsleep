@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackParamList } from '../../navigation/types';
 // import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
 // import auth from '@react-native-firebase/auth';
 import { Button } from '../../design-system/components/Button';
@@ -13,7 +16,10 @@ const validateEmail = (email: string) => {
   return re.test(email);
 };
 
+type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
+
 export const LoginScreen = () => {
+  const navigation = useNavigation<LoginScreenNavigationProp>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -74,7 +80,7 @@ export const LoginScreen = () => {
         style={styles.input}
       />
         <TouchableOpacity
-        onPress={() => console.log('Navigate to forgot password')}
+        onPress={() => navigation.navigate('ForgotPassword')}
           style={styles.forgotPasswordLink}
         >
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
@@ -125,7 +131,7 @@ export const LoginScreen = () => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        onPress={() => console.log('Navigate to sign up')}
+        onPress={() => navigation.navigate('SignUp')}
         style={styles.signUpLink}
         disabled={loading}
       >

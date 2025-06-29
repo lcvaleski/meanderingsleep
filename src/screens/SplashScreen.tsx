@@ -2,10 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Button } from '../design-system/components/Button';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackParamList } from '../navigation/types';
 
 const { width, height } = Dimensions.get('window');
 
-export const SplashScreen = ({ navigation }: any) => {
+type SplashScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Splash'>;
+
+export const SplashScreen = () => {
+  const navigation = useNavigation<SplashScreenNavigationProp>();
   return (
     <LinearGradient
       colors={['#838ACA', '#2E2464']}
