@@ -76,6 +76,12 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace "net.coventry.sleepless"
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    
     defaultConfig {
         applicationId "net.coventry.sleepless"
         minSdkVersion rootProject.ext.minSdkVersion

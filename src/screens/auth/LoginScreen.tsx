@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, Alert, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -7,7 +7,7 @@ import { AuthStackParamList } from '../../navigation/types';
 // import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
 // import auth from '@react-native-firebase/auth';
 import { Button } from '../../design-system/components/Button';
-import { FormField } from '../../design-system/components/FormField';
+import { SimpleInput } from '../../components/SimpleInput';
 import { Logo } from '../../design-system/components/Logo';
 import { colors, typography, spacing } from '../../design-system/theme';
 
@@ -53,32 +53,35 @@ export const LoginScreen = () => {
   };
 
   return (
-    <ScrollView 
-      style={styles.scrollView}
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
+    <KeyboardAvoidingView 
+      style={styles.keyboardView}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <Logo />
-      <Text style={styles.title}>Login</Text>
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <View style={styles.formFields}>
-      <FormField
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        editable={!loading}
-        style={styles.input}
-      />
-      <FormField
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-          secureTextEntry={true}
-        editable={!loading}
-        style={styles.input}
-      />
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <Logo />
+        <Text style={styles.title}>Login</Text>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        <View style={styles.formFields}>
+          <SimpleInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            editable={!loading}
+          />
+          <SimpleInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
+            editable={!loading}
+          />
         <TouchableOpacity
         onPress={() => navigation.navigate('ForgotPassword')}
           style={styles.forgotPasswordLink}
@@ -139,14 +142,18 @@ export const LoginScreen = () => {
           Don't have an account? <Text style={styles.signUpTextBold}>Sign Up</Text>
         </Text>
       </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
+  keyboardView: {
     flex: 1,
     backgroundColor: colors.primary.nocturne,
+  },
+  scrollView: {
+    flex: 1,
   },
   container: {
     flexGrow: 1,
