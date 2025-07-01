@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Alert, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../design-system/components/Button';
-import { FormField } from '../../design-system/components/FormField';
+import { EnhancedInput } from '../../components/EnhancedInput';
 import { Logo } from '../../design-system/components/Logo';
 import { colors, typography, spacing } from '../../design-system/theme';
 // import { AppleButton } from '@invertase/react-native-apple-authentication';
@@ -53,45 +53,52 @@ export const SignUpScreen = ({ navigation }: any) => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.keyboardView}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
       <Logo />
       <Text style={styles.title}>Create Account</Text>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <View style={styles.formFields}>
-      <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Email<Text style={styles.asterisk}>*</Text></Text>
-        <FormField
+        <EnhancedInput
+          label="Email"
           placeholder="example@email.com"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
           editable={!loading}
-          style={styles.input}
+          showClearButton
+          animateLabel
+          error={email && !validateEmail(email) ? 'Please enter a valid email' : ''}
         />
-      </View>
-      <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Password<Text style={styles.asterisk}>*</Text></Text>
-        <FormField
+        <EnhancedInput
+          label="Password"
           placeholder="Enter your password"
           value={password}
           onChangeText={setPassword}
-            secureTextEntry={true}
+          secureTextEntry={true}
           editable={!loading}
-          style={styles.input}
+          animateLabel
+          error={password && password.length < 6 ? 'Password must be at least 6 characters' : ''}
         />
-      </View>
-      <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Confirm Password<Text style={styles.asterisk}>*</Text></Text>
-        <FormField
-          placeholder="Enter your password"
+        <EnhancedInput
+          label="Confirm Password"
+          placeholder="Re-enter your password"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-            secureTextEntry={true}
+          secureTextEntry={true}
           editable={!loading}
-          style={styles.input}
+          animateLabel
+          error={confirmPassword && password !== confirmPassword ? 'Passwords do not match' : ''}
         />
-        </View>
       </View>
       <Button
         title="Sign Up"
@@ -116,7 +123,7 @@ export const SignUpScreen = ({ navigation }: any) => {
             activeOpacity={0.7}
           >
             <Image
-              source={require('../../../assets/apple-icon.png')}
+              source={require('../../assets/apple-icon.png')}
               style={styles.socialIcon}
               resizeMode="contain"
             />
@@ -130,7 +137,7 @@ export const SignUpScreen = ({ navigation }: any) => {
           activeOpacity={0.7}
         >
           <Image
-            source={require('../../../assets/google-icon.png')}
+            source={require('../../assets/google-icon.png')}
             style={styles.socialIcon}
             resizeMode="contain"
           />
@@ -144,16 +151,23 @@ export const SignUpScreen = ({ navigation }: any) => {
       >
         <Text style={styles.loginText}>Already have an account? <Text style={styles.loginTextBold}>Login</Text></Text>
       </TouchableOpacity>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    keyboardView: {
         flex: 1,
+        backgroundColor: colors.primary.nocturne,
+      },
+      scrollView: {
+        flex: 1,
+      },
+      container: {
+        flexGrow: 1,
         padding: spacing.lg,
         justifyContent: 'center',
-        backgroundColor: colors.primary.nocturne,
       },
       title: {
         fontSize: typography.fontSize['2xl'],
@@ -227,7 +241,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.primary.blueberry_dark,
+        backgroundColor: colors.primary.blueberry,
         borderRadius: 24,
         paddingVertical: 12,
         width: '90%',

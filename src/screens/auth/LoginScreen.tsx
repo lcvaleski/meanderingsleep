@@ -7,7 +7,7 @@ import { AuthStackParamList } from '../../navigation/types';
 // import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
 // import auth from '@react-native-firebase/auth';
 import { Button } from '../../design-system/components/Button';
-import { SimpleInput } from '../../components/SimpleInput';
+import { EnhancedInput } from '../../components/EnhancedInput';
 import { Logo } from '../../design-system/components/Logo';
 import { colors, typography, spacing } from '../../design-system/theme';
 
@@ -67,20 +67,25 @@ export const LoginScreen = () => {
         <Text style={styles.title}>Login</Text>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         <View style={styles.formFields}>
-          <SimpleInput
-            placeholder="Email"
+          <EnhancedInput
+            label="Email"
+            placeholder="Enter your email"
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
             editable={!loading}
+            showClearButton
+            animateLabel
           />
-          <SimpleInput
-            placeholder="Password"
+          <EnhancedInput
+            label="Password"
+            placeholder="Enter your password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={true}
             editable={!loading}
+            animateLabel
           />
         <TouchableOpacity
         onPress={() => navigation.navigate('ForgotPassword')}
@@ -112,7 +117,7 @@ export const LoginScreen = () => {
             activeOpacity={0.7}
           >
             <Image
-              source={require('../../../assets/apple-icon.png')}
+              source={require('../../assets/apple-icon.png')}
               style={styles.socialIcon}
               resizeMode="contain"
             />
@@ -126,7 +131,7 @@ export const LoginScreen = () => {
           activeOpacity={0.7}
         >
           <Image
-            source={require('../../../assets/google-icon.png')}
+            source={require('../../assets/google-icon.png')}
             style={styles.socialIcon}
             resizeMode="contain"
           />
@@ -134,7 +139,10 @@ export const LoginScreen = () => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        onPress={() => navigation.navigate('SignUp')}
+        onPress={() => {
+          console.log('Sign up link pressed, navigating to SignUp');
+          navigation.navigate('SignUp');
+        }}
         style={styles.signUpLink}
         disabled={loading}
       >

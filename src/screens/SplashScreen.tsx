@@ -35,7 +35,10 @@ export const SplashScreen = () => {
       <View style={styles.buttonContainer}>
         <Button
           title="Continue"
-          onPress={() => navigation.navigate('SignUp')}
+          onPress={() => {
+            console.log('Continue button pressed, navigating to SignUp');
+            navigation.navigate('SignUp');
+          }}
           variant="secondary"
           size="medium"
           style={{ width: '75%' }}
