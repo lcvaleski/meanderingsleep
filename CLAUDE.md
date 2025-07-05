@@ -86,3 +86,38 @@ Located in `src/design-system/`:
 - `/src/screens/` - Screen components
 - `/src/services/` - Business logic and audio services
 - `/src/assets/` - Images, audio files, and data
+
+## Working Dependency Configuration
+
+### Critical Dependencies for Android Build
+These exact versions are known to work together without patches:
+
+```json
+{
+  "react-native": "0.73.6",
+  "react-native-screens": "^3.29.0",
+  "@react-navigation/native": "6.1.9",
+  "@react-navigation/stack": "6.3.20",
+  "react-native-gesture-handler": "2.14.0",
+  "react-native-safe-area-context": "4.5.0"
+}
+```
+
+### Android Build Configuration
+```gradle
+compileSdkVersion = 34  // DO NOT use 35 - causes react-native-screens errors
+targetSdkVersion = 34
+minSdkVersion = 26
+buildToolsVersion = "34.0.0"
+kotlinVersion = "1.8.0"
+```
+
+### Key Fixes Applied
+1. **Downgraded compileSdkVersion from 35 to 34** - SDK 35 has known incompatibilities with react-native-screens
+2. **Upgraded react-native-screens from 3.20.0 to 3.29.0** - This version includes fixes for Canvas type errors
+3. **Cleared Metro cache and reinstalled @react-navigation packages** - Fixed module resolution issues
+
+### When Issues Occur
+1. Clear Metro cache: `npx react-native start --reset-cache`
+2. Clean Android build: `cd android && ./gradlew clean`
+3. Remove and reinstall navigation packages: `rm -rf node_modules/@react-navigation && npm install`
