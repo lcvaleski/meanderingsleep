@@ -8,6 +8,9 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
+# Enable modular headers for Firebase compatibility
+use_modular_headers!
+
 # If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
 # because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
 #
@@ -17,8 +20,7 @@ prepare_react_native_project!
 #   dependencies: {
 #     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
 # ```
-flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
-
+flipper_config = FlipperConfiguration.disabled
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
@@ -30,14 +32,10 @@ target 'MeanderingSleepApp' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # Enables Flipper.
-    #
-    # Note that if you have use_frameworks! enabled, Flipper will not work and
-    # you should disable the next line.
-    :flipper_configuration => flipper_config,
-    # An absolute path to your application root.
+    :fabric_enabled => false, # 👈 Add this line if it's not there
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
 
   target 'MeanderingSleepAppTests' do
     inherit! :complete
@@ -51,5 +49,21 @@ target 'MeanderingSleepApp' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
+    
+    # Fix for undefined symbols and architecture issues
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'x86_64'
+      end
+    end
+    
+    # Also update the main project
+    installer.aggregate_targets.each do |target|
+      target.xcconfigs.each do |variant, xcconfig|
+        xcconfig_path = target.client_root + target.xcconfig_relative_path(variant)
+        IO.write(xcconfig_path, IO.read(xcconfig_path).gsub("DT_TOOLCHAIN_DIR", "TOOLCHAIN_DIR"))
+      end
+    end
   end
 end
