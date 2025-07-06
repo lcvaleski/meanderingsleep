@@ -121,3 +121,60 @@ kotlinVersion = "1.8.0"
 1. Clear Metro cache: `npx react-native start --reset-cache`
 2. Clean Android build: `cd android && ./gradlew clean`
 3. Remove and reinstall navigation packages: `rm -rf node_modules/@react-navigation && npm install`
+
+## iOS Setup and Troubleshooting
+
+### App Name Configuration
+The app name must be consistent across all configurations:
+- `app.json`: `"name": "MeanderingSleepApp"`
+- iOS: `AppDelegate.mm` - `self.moduleName = @"MeanderingSleepApp"`
+- Android: `MainActivity.java` - `return "MeanderingSleepApp"`
+
+### Firebase iOS Setup
+1. **GoogleService-Info.plist Location**: Must be in `ios/MeanderingSleepApp/` directory
+2. **Add to Xcode Project**:
+   - Right-click MeanderingSleepApp folder in Xcode
+   - Select "Add Files to MeanderingSleepApp..."
+   - Select GoogleService-Info.plist
+   - Ensure "Copy items if needed" is checked
+3. **Native Initialization**: Added to `AppDelegate.mm`:
+   ```objc
+   #import <Firebase.h>
+   
+   - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+     [FIRApp configure];
+     // ... rest of method
+   }
+   ```
+
+### iOS Build Issues and Solutions
+1. **Architecture Mismatch (x86_64 vs arm64)**:
+   - Disabled Fabric/New Architecture: `Podfile` - `:fabric_enabled => false`
+   - Added architecture fixes to Podfile post_install
+   - Excluded x86_64 for simulator builds
+
+2. **Build System Issues**:
+   - Clean derived data: `rm -rf ~/Library/Developer/Xcode/DerivedData/MeanderingSleepApp-*`
+   - Kill stuck builds: `pkill xcodebuild`
+   - Reinstall pods: `cd ios && pod install --repo-update`
+
+3. **Xcode Build Process**:
+   - Open `ios/MeanderingSleepApp.xcworkspace` (not .xcodeproj)
+   - Select scheme: MeanderingSleepApp
+   - Select simulator: iPhone 16 Plus
+   - Clean build folder: Shift+Cmd+K
+   - Build and run: Cmd+R
+
+### Running on Specific iOS Simulator
+```bash
+# Run on specific simulator
+npx react-native run-ios --simulator="iPhone 16 Plus"
+
+# List available simulators
+xcrun simctl list devices
+```
+
+### Common iOS Errors
+1. **"MeanderingSleepApp" has not been registered**: App name mismatch between JS and native
+2. **No Firebase App '[DEFAULT]'**: GoogleService-Info.plist not properly linked or Firebase not initialized
+3. **PIF transfer session error**: Build system conflict, requires cleaning derived data
