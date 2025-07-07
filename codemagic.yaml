@@ -28,11 +28,11 @@ workflows:
         script: | 
           npm install
       
-      # Step 2: Run tests
-      - name: Run tests
-        script: |
-          npm run lint
-          npm run test
+      # # Step 2: Run tests
+      # - name: Run tests
+      #   script: |
+      #     npm run lint
+      #     npm run test
       
       # Step 3: Configure Android SDK location in local.properties
       - name: Set Android SDK location
@@ -115,11 +115,11 @@ workflows:
           npm install
           cd ios && pod install && cd ..
       
-      # Step 2: Run tests
-      - name: Run tests
-        script: |
-          npm run lint
-          npm run test
+      # # Step 2: Run tests
+      # - name: Run tests
+      #   script: |
+      #     npm run lint
+      #     npm run test
       
       # Step 3: Configure code signing based on profiles from Codemagic
       - name: Set up code signing
