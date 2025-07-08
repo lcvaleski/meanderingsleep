@@ -11,7 +11,7 @@ workflows:
     environment:
       # Android signing configuration for release builds
       android_signing:
-        - meandering-keystore  # References the keystore configured in Codemagic
+        - Keystore  # References the keystore configured in Codemagic
       
       # Reference to a group of environment variables configured in Codemagic
       groups:
