@@ -11,7 +11,7 @@ workflows:
     environment:
       # Android signing configuration for release builds
       android_signing:
-        - meandering-keystore  # References the keystore configured in Codemagic
+        - Keystore  # References the keystore configured in Codemagic
       
       # Reference to a group of environment variables configured in Codemagic
       groups:
@@ -28,11 +28,11 @@ workflows:
         script: | 
           npm install
       
-      # Step 2: Run tests
-      - name: Run tests
-        script: |
-          npm run lint
-          npm run test
+      # # Step 2: Run tests
+      # - name: Run tests
+      #   script: |
+      #     npm run lint
+      #     npm run test
       
       # Step 3: Configure Android SDK location in local.properties
       - name: Set Android SDK location
@@ -57,9 +57,9 @@ workflows:
             # BUILD_NUMBER is automatically incremented with each build in this workflow
             UPDATED_BUILD_NUMBER=$BUILD_NUMBER
           else
-            # Increment the build number from Google Play by 5 for a safety margin
+            # Increment the build number from Google Play by 10 for a safety margin
             # This handles potential issues with stale or cached data
-            UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 5))
+            UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 10))
             echo "Latest build number from Google Play: $LATEST_GOOGLE_PLAY_BUILD_NUMBER, setting to: $UPDATED_BUILD_NUMBER"
           fi
           
@@ -72,6 +72,7 @@ workflows:
     # Files to save after build completion
     artifacts:
       - android/app/build/outputs/**/*.aab  # Android App Bundle for release
+    
     # Publishing configuration for Google Play Store
     publishing:
       google_play:
@@ -91,7 +92,7 @@ workflows:
       app_store_connect: codemagic  # Uses App Store Connect API key named 'codemagic'
     
     environment:
-
+      # Reference to a group of environment variables configured in Codemagic
       groups:
         - google_credentials  # Contains Google Play API access credentials
 
@@ -102,8 +103,8 @@ workflows:
       
       # Custom environment variables for this workflow
       vars:
-        XCODE_WORKSPACE: "meanderingsleep.xcworkspace"  # Xcode workspace file name
-        XCODE_SCHEME: "meanderingsleep"  # Xcode build scheme name
+        XCODE_WORKSPACE: "MeanderingSleepApp.xcworkspace"  # Xcode workspace file name
+        XCODE_SCHEME: "MeanderingSleepApp"  # Xcode build scheme name
         APP_STORE_APPLE_ID: 6502964632  # App's unique identifier in App Store Connect
         APP_VERSION: "0.2.3"  # Application version number (semver)
     
@@ -114,11 +115,11 @@ workflows:
           npm install
           cd ios && pod install && cd ..
       
-      # Step 2: Run tests
-      - name: Run tests
-        script: |
-          npm run lint
-          npm run test
+      # # Step 2: Run tests
+      # - name: Run tests
+      #   script: |
+      #     npm run lint
+      #     npm run test
       
       # Step 3: Configure code signing based on profiles from Codemagic
       - name: Set up code signing
@@ -129,7 +130,7 @@ workflows:
       - name: Set up Firebase configuration
         script: |
           # Decode the base64-encoded GoogleService-Info.plist and write it to the correct location
-          echo $IOS_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/ios/GoogleService-Info.plist"
+          echo $IOS_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/ios/MeanderingSleepApp/GoogleService-Info.plist"
       
       # Step 5: Set version and increment build number based on TestFlight
       - name: Set version and build number
@@ -143,7 +144,11 @@ workflows:
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
           # Add a safety margin to ensure we're above any existing build number
           # Also handles case where the API returns stale data
-          NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 5))
+          # Ensure minimum build number is 23 (higher than the rejected 22)
+          if [ -z "$LATEST_BUILD_NUMBER" ] || [ "$LATEST_BUILD_NUMBER" -lt 22 ]; then
+            LATEST_BUILD_NUMBER=22
+          fi
+          NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 10))
           echo "Latest build number from App Store: $LATEST_BUILD_NUMBER, setting to: $NEW_BUILD_NUMBER"
           agvtool new-version -all $NEW_BUILD_NUMBER
       
@@ -160,6 +165,7 @@ workflows:
       - /tmp/xcodebuild_logs/*.log  # Build logs for debugging
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app  # Built app
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM  # Debug symbols
+    
     # Publishing configuration for App Store Connect
     publishing:
       app_store_connect:

@@ -1,48 +1,56 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
-import { getAuth, sendPasswordResetEmail } from '@react-native-firebase/auth';
+import { View, Text, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../design-system/components/Button';
-import { FormField } from '../../design-system/components/FormField';
+import { EnhancedInput } from '../../components/EnhancedInput';
 import { colors, typography, spacing } from '../../design-system/theme';
 
 export const ForgotPasswordScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { resetPassword } = useAuth();
 
   const handleResetPassword = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email address.');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const auth = getAuth();
-      await sendPasswordResetEmail(auth, email);
+      await resetPassword(email);
       Alert.alert(
         'Success',
         'Password reset email sent. Please check your inbox.',
         [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
       );
-    } catch (error: any) {
-      let message = 'Failed to send reset email. Please try again.';
-      if (error.code === 'auth/invalid-email') {
-        message = 'Invalid email address.';
-      } else if (error.code === 'auth/user-not-found') {
-        message = 'No user found with this email.';
-      } else if (error.message) {
-        message = error.message.replace(/\[.*?\]\s*/, '');
-      }
-      Alert.alert('Error', message);
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'Failed to send reset email');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={styles.content}>
       <Text style={styles.title}>Reset Password</Text>
       <Text style={styles.subtitle}>
         Enter your email address and we'll send you instructions to reset your password.
       </Text>
-      <FormField
-        placeholder="Email"
+      <EnhancedInput
+        label="Email"
+        placeholder="Enter your email address"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
-        style={styles.input}
+        editable={!loading}
+        showClearButton
+        animateLabel
       />
       <Button
         title="Send Reset Link"
@@ -50,6 +58,8 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
         variant="primary"
         size="large"
         style={styles.button}
+        loading={loading}
+        disabled={!email || loading}
       />
       <Button
         title="Back to Login"
@@ -58,16 +68,20 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
         size="small"
         style={styles.backLink}
       />
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.primary.nocturne,
+  },
+  content: {
+    flex: 1,
     padding: spacing.lg,
     justifyContent: 'center',
-    backgroundColor: colors.primary.nocturne,
   },
   title: {
     fontSize: typography.fontSize['2xl'],

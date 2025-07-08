@@ -1,26 +1,17 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider } from './src/contexts/AuthContext';
-import { AuthStack } from './src/navigation/AuthStack';
-import { ThemeProvider } from './src/design-system/ThemeProvider';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import initializeFirebase from './src/config/firebase';
 
-const App = () => {
+// Initialize Firebase on app start
+initializeFirebase();
+
+function App(): React.JSX.Element {
   return (
-    <ThemeProvider>
-      <NavigationContainer>
-        <AuthProvider>
-          <AuthStack />
-        </AuthProvider>
-      </NavigationContainer>
-    </ThemeProvider>
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
   );
-};
+}
 
 export default App;

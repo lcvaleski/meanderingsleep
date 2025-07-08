@@ -29,3 +29,9 @@ Then:
 
 `npx react-native run-ios`
 `npx react-native run-android`
+
+# Useful stuff
+
+`cd ios && rm -rf Pods Podfile.lock && pod deintegrate && pod install && cd .. && rm -rf node_modules && npm install && npx react-native run-ios --simulator="iPhone 16 Plus"`
+
+`cd android && ./gradlew clean && cd .. && rm -rf node_modules && npm install && npx react-native run-android`

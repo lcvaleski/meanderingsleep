@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, Alert, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
-import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
-import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackParamList } from '../../navigation/types';
+// import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
+// import auth from '@react-native-firebase/auth';
 import { Button } from '../../design-system/components/Button';
-import { FormField } from '../../design-system/components/FormField';
+import { EnhancedInput } from '../../components/EnhancedInput';
 import { Logo } from '../../design-system/components/Logo';
 import { colors, typography, spacing } from '../../design-system/theme';
 
@@ -13,99 +16,77 @@ const validateEmail = (email: string) => {
   return re.test(email);
 };
 
-export const LoginScreen = ({ navigation }: any) => {
+type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
+
+export const LoginScreen = () => {
+  const navigation = useNavigation<LoginScreenNavigationProp>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { signIn, signInWithGoogle, loading } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
 
   const isFormValid = !!email && !!password && validateEmail(email);
 
   const handleLogin = async () => {
     setError('');
-    if (!email || !password) {
-      setError('Email and password are required.');
-      return;
-    }
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
+    setLoading(true);
     try {
       await signIn(email, password);
-      navigation.replace('AuthLoading');
-    } catch (error: any) {
-      let message = 'Login failed. Please try again.';
-      if (error.code === 'auth/user-not-found') {
-        message = 'No user found with this email.';
-      } else if (error.code === 'auth/wrong-password') {
-        message = 'Incorrect password.';
-      } else if (error.code === 'auth/invalid-email') {
-        message = 'Invalid email address.';
-      } else if (error.code === 'auth/invalid-credential') {
-        message = 'The email or password is incorrect or has expired.';
-      } else if (error.message) {
-        message = error.message.replace(/\[.*?\]\s*/, '');
-      }
-      setError(message);
+      // Navigation will be handled by auth state change
+    } catch (err: any) {
+      setError(err.message || 'Failed to login');
+      Alert.alert('Login Error', err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-      navigation.replace('AuthLoading');
-    } catch (error: any) {
-      let message = 'Google Sign-In failed. Please try again.';
-      if (error.message) {
-        message = error.message.replace(/\[.*?\]\s*/, '');
-      }
-      setError(message);
-    }
+    // Placeholder function
+    console.log('Signing in with Google');
   };
 
   const handleAppleSignIn = async () => {
-    try {
-      const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: appleAuth.Operation.LOGIN,
-        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-      });
-      const { identityToken, nonce } = appleAuthRequestResponse;
-      if (identityToken && nonce) {
-        const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
-        await auth().signInWithCredential(appleCredential);
-        navigation.replace('AuthLoading');
-      } else {
-        throw new Error('Apple Sign-In failed: Missing identityToken or nonce');
-      }
-    } catch (error) {
-      console.error('Apple Sign-In Error:', error);
-    }
+    // Placeholder function
+    console.log('Signing in with Apple');
   };
 
   return (
-    <View style={styles.container}>
-      <Logo />
-      <Text style={styles.title}>Login</Text>
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <View style={styles.formFields}>
-      <FormField
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        editable={!loading}
-        style={styles.input}
-      />
-      <FormField
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-          secureTextEntry={true}
-        editable={!loading}
-        style={styles.input}
-      />
+    <KeyboardAvoidingView 
+      style={styles.keyboardView}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <Logo />
+        <Text style={styles.title}>Login</Text>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        <View style={styles.formFields}>
+          <EnhancedInput
+            label="Email"
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            editable={!loading}
+            showClearButton
+            animateLabel
+          />
+          <EnhancedInput
+            label="Password"
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
+            editable={!loading}
+            animateLabel
+          />
         <TouchableOpacity
         onPress={() => navigation.navigate('ForgotPassword')}
           style={styles.forgotPasswordLink}
@@ -158,7 +139,10 @@ export const LoginScreen = ({ navigation }: any) => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        onPress={() => navigation.navigate('SignUp')}
+        onPress={() => {
+          console.log('Sign up link pressed, navigating to SignUp');
+          navigation.navigate('SignUp');
+        }}
         style={styles.signUpLink}
         disabled={loading}
       >
@@ -166,16 +150,23 @@ export const LoginScreen = ({ navigation }: any) => {
           Don't have an account? <Text style={styles.signUpTextBold}>Sign Up</Text>
         </Text>
       </TouchableOpacity>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  keyboardView: {
     flex: 1,
+    backgroundColor: colors.primary.nocturne,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  container: {
+    flexGrow: 1,
     padding: spacing.lg,
     justifyContent: 'center',
-    backgroundColor: colors.primary.nocturne,
   },
   title: {
     fontSize: typography.fontSize['2xl'],
@@ -187,10 +178,6 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: spacing.md,
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: spacing.md,
-  },
   forgotPasswordLink: {
     alignSelf: 'flex-end',
     marginBottom: spacing.md,
@@ -200,12 +187,6 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.sm,
     textDecorationLine: 'underline',
     fontFamily: typography.fontFamily.medium,
-  },
-  loginButton: {
-    marginTop: spacing.sm,
-  },
-  signUpButton: {
-    marginTop: spacing.lg,
   },
   signUpLink: {
     alignItems: 'center',
@@ -248,34 +229,29 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   socialButtonsContainer: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.lg,
     width: '100%',
+    alignItems: 'center',
   },
   socialButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: colors.primary.blueberry,
+    borderRadius: 24,
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    width: '90%',
     marginBottom: spacing.md,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.primary.blueberry,
   },
   socialIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 12,
+    width: 20,
+    height: 20,
+    marginRight: spacing.md,
   },
   socialButtonText: {
-    color: '#222',
-    fontSize: 16,
-    fontWeight: '500',
+    color: colors.primary.white,
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.bold,
   },
-}); 
+});

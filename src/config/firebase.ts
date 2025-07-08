@@ -1,42 +1,34 @@
-import { getAuth, signInWithEmailAndPassword as firebaseSignIn, createUserWithEmailAndPassword as firebaseCreateUser, signOut as firebaseSignOut } from '@react-native-firebase/auth';
+import firebase from '@react-native-firebase/app';
+import { Platform } from 'react-native';
 
-// Initialize Firebase Auth
-export const initializeFirebase = () => {
-  // Firebase is automatically initialized when the app starts
-  // This function can be used to add any additional initialization logic
-};
-
-// Authentication functions
-export const signInWithEmailAndPassword = async (email: string, password: string) => {
+// Initialize Firebase
+const initializeFirebase = () => {
   try {
-    const auth = getAuth();
-    const userCredential = await firebaseSignIn(auth, email, password);
-    return userCredential.user;
+    // Check if Firebase is already initialized
+    if (firebase.apps.length > 0) {
+      console.log('Firebase already initialized');
+      return;
+    }
+
+    // Firebase should auto-initialize on iOS if GoogleService-Info.plist is present
+    // and on Android if google-services.json is present
+    // Sometimes we need to explicitly access the app to trigger initialization
+    const app = firebase.app();
+    console.log('Firebase initialized successfully:', app.name);
   } catch (error) {
-    throw error;
+    console.error('Firebase initialization error:', error);
+    
+    // If Firebase fails to auto-initialize, it usually means:
+    // 1. GoogleService-Info.plist is not added to the iOS project
+    // 2. google-services.json is not in android/app/
+    // 3. The file is corrupted or has incorrect format
+    
+    if (Platform.OS === 'ios') {
+      console.error('Make sure GoogleService-Info.plist is added to your Xcode project');
+    } else {
+      console.error('Make sure google-services.json is in android/app/ directory');
+    }
   }
 };
 
-export const createUserWithEmailAndPassword = async (email: string, password: string) => {
-  try {
-    const auth = getAuth();
-    const userCredential = await firebaseCreateUser(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const signOut = async () => {
-  try {
-    const auth = getAuth();
-    await firebaseSignOut(auth);
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getCurrentUser = () => {
-  const auth = getAuth();
-  return auth.currentUser;
-}; 
+export default initializeFirebase;

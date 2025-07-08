@@ -2,32 +2,16 @@
  * @format
  */
 
+import 'react-native';
 import React from 'react';
-import ReactTestRenderer from 'react-test-renderer';
 import App from '../App';
 
-// Mock React Native
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-  RN.InteractionManager = {
-    createInteractionHandle: jest.fn(() => 1),
-    clearInteractionHandle: jest.fn(),
-    runAfterInteractions: jest.fn(callback => callback()),
-  };
-  return RN;
-});
+// Note: import explicitly to use the types shipped with jest.
+import {it} from '@jest/globals';
 
-test('renders correctly', async () => {
-  let renderer: ReactTestRenderer.ReactTestRenderer;
-  
-  await ReactTestRenderer.act(() => {
-    renderer = ReactTestRenderer.create(<App />);
-  });
+// Note: test renderer must be required after react-native.
+import renderer from 'react-test-renderer';
 
-  // Clean up
-  await ReactTestRenderer.act(async () => {
-    renderer!.unmount();
-    // Wait for any pending animations
-    await new Promise(resolve => setTimeout(resolve, 0));
-  });
+it('renders correctly', () => {
+  renderer.create(<App />);
 });
