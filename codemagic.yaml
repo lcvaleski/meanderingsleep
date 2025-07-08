@@ -57,9 +57,9 @@ workflows:
             # BUILD_NUMBER is automatically incremented with each build in this workflow
             UPDATED_BUILD_NUMBER=$BUILD_NUMBER
           else
-            # Increment the build number from Google Play by 5 for a safety margin
+            # Increment the build number from Google Play by 10 for a safety margin
             # This handles potential issues with stale or cached data
-            UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 5))
+            UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 10))
             echo "Latest build number from Google Play: $LATEST_GOOGLE_PLAY_BUILD_NUMBER, setting to: $UPDATED_BUILD_NUMBER"
           fi
           
@@ -144,7 +144,11 @@ workflows:
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
           # Add a safety margin to ensure we're above any existing build number
           # Also handles case where the API returns stale data
-          NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 5))
+          # Ensure minimum build number is 23 (higher than the rejected 22)
+          if [ -z "$LATEST_BUILD_NUMBER" ] || [ "$LATEST_BUILD_NUMBER" -lt 22 ]; then
+            LATEST_BUILD_NUMBER=22
+          fi
+          NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 10))
           echo "Latest build number from App Store: $LATEST_BUILD_NUMBER, setting to: $NEW_BUILD_NUMBER"
           agvtool new-version -all $NEW_BUILD_NUMBER
       
