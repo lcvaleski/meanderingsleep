@@ -132,15 +132,7 @@ workflows:
           # Decode the base64-encoded GoogleService-Info.plist and write it to the correct location
           echo $IOS_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/ios/MeanderingSleepApp/GoogleService-Info.plist"
       
-      # Step 5: Set device family to support iPhone and iPad
-      - name: Set device family support
-        script: |
-          cd $CM_BUILD_DIR/ios
-          # Set TARGETED_DEVICE_FAMILY to "1,2" (1=iPhone, 2=iPad)
-          sed -i '' 's/TARGETED_DEVICE_FAMILY = [^;]*/TARGETED_DEVICE_FAMILY = "1,2"/g' MeanderingSleepApp.xcodeproj/project.pbxproj
-          echo "Set TARGETED_DEVICE_FAMILY to support both iPhone and iPad"
-      
-      # Step 6: Set version and increment build number based on TestFlight
+      # Step 5: Set version and increment build number based on TestFlight
       - name: Set version and build number
         script: | 
           #!/bin/sh
@@ -160,7 +152,7 @@ workflows:
           echo "Latest build number from App Store: $LATEST_BUILD_NUMBER, setting to: $NEW_BUILD_NUMBER"
           agvtool new-version -all $NEW_BUILD_NUMBER
       
-      # Step 7: Build the iOS app and create an IPA package
+      # Step 6: Build the iOS app and create an IPA package
       - name: Build .ipa for release
         script: |
           xcode-project build-ipa \
