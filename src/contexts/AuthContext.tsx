@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 interface AuthContextData {
   user: FirebaseAuthTypes.User | null;
@@ -8,6 +9,7 @@ interface AuthContextData {
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -25,6 +27,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Configure Google Sign-In
+    GoogleSignin.configure({
+      webClientId: '19411767388-h51prlnnii7or8cle558l7kqa879gfvn.apps.googleusercontent.com',
+      offlineAccess: true,
+    });
+
     const unsubscribe = auth().onAuthStateChanged((_user) => {
       setUser(_user);
       setLoading(false);
@@ -69,6 +77,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      // Check if your device supports Google Play
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      
+      // Get the users ID token
+      const { idToken } = await GoogleSignin.signIn();
+
+      // Create a Google credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+      // Sign-in the user with the credential
+      await auth().signInWithCredential(googleCredential);
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -78,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signOut,
         resetPassword,
+        signInWithGoogle,
       }}
     >
       {children}

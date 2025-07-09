@@ -18,7 +18,7 @@ export const SignUpScreen = ({ navigation }: any) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
 
   const isFormValid =
     !!email &&
@@ -43,8 +43,17 @@ export const SignUpScreen = ({ navigation }: any) => {
   };
 
   const handleGoogleSignIn = async () => {
-    // Placeholder function
-    console.log('Signing in with Google');
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+      // Navigation will be handled by auth state change
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in with Google');
+      Alert.alert('Google Sign-In Error', err.message);
+    } finally {
+      setLoading(false);
+    }
   };
   
   const handleAppleSignIn = async () => {

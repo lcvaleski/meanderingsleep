@@ -24,7 +24,7 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
 
   const isFormValid = !!email && !!password && validateEmail(email);
 
@@ -43,8 +43,17 @@ export const LoginScreen = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    // Placeholder function
-    console.log('Signing in with Google');
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+      // Navigation will be handled by auth state change
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in with Google');
+      Alert.alert('Google Sign-In Error', err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAppleSignIn = async () => {
