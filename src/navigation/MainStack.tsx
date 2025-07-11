@@ -27,7 +27,16 @@ function MainScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primary.nocturne} />
       {showPlayer ? (
-        <AudioPlayer />
+        <View style={styles.playerContainer}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => setShowPlayer(false)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.backButtonText}>← Back</Text>
+          </TouchableOpacity>
+          <AudioPlayer />
+        </View>
       ) : (
         <ScrollView 
           style={styles.scrollView}
@@ -141,5 +150,18 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.sm,
     fontFamily: typography.fontFamily.regular,
     color: colors.secondary.lavender,
+  },
+  playerContainer: {
+    flex: 1,
+  },
+  backButton: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    marginTop: spacing.md,
+  },
+  backButtonText: {
+    fontSize: typography.fontSize.lg,
+    fontFamily: typography.fontFamily.medium,
+    color: colors.primary.orchid,
   },
 });
