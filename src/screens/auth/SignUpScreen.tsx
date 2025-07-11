@@ -78,7 +78,6 @@ export const SignUpScreen = ({ navigation }: any) => {
       <View style={styles.formFields}>
         <EnhancedInput
           label="Email"
-          placeholder="example@email.com"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -90,7 +89,6 @@ export const SignUpScreen = ({ navigation }: any) => {
         />
         <EnhancedInput
           label="Password"
-          placeholder="Enter your password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry={true}
@@ -100,7 +98,6 @@ export const SignUpScreen = ({ navigation }: any) => {
         />
         <EnhancedInput
           label="Confirm Password"
-          placeholder="Re-enter your password"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry={true}

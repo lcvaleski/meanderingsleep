@@ -78,7 +78,6 @@ export const LoginScreen = () => {
         <View style={styles.formFields}>
           <EnhancedInput
             label="Email"
-            placeholder="Enter your email"
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -89,7 +88,6 @@ export const LoginScreen = () => {
           />
           <EnhancedInput
             label="Password"
-            placeholder="Enter your password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={true}
