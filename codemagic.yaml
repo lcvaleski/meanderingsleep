@@ -142,12 +142,6 @@ workflows:
           
           # Set build number (CFBundleVersion)
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
-          # Add a safety margin to ensure we're above any existing build number
-          # Also handles case where the API returns stale data
-          # Ensure minimum build number is 23 (higher than the rejected 22)
-          if [ -z "$LATEST_BUILD_NUMBER" ] || [ "$LATEST_BUILD_NUMBER" -lt 22 ]; then
-            LATEST_BUILD_NUMBER=22
-          fi
           NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 10))
           echo "Latest build number from App Store: $LATEST_BUILD_NUMBER, setting to: $NEW_BUILD_NUMBER"
           agvtool new-version -all $NEW_BUILD_NUMBER
