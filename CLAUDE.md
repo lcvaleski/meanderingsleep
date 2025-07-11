@@ -57,6 +57,7 @@ npm run postinstall
 Located in `src/design-system/`:
 - **Theme**: Centralized colors, typography, and spacing
 - **Components**: Button, FormField, Logo - all use theme system
+- **EnhancedInput**: Advanced input component with animated labels in `src/components/`
 - **Consistent styling**: All components reference the theme object
 
 ### State Management
