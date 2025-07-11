@@ -129,7 +129,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     marginBottom: spacing.lg,
-    tintColor: colors.secondary.periwinkle,
   },
   categoryTitle: {
     fontSize: typography.fontSize.lg,
