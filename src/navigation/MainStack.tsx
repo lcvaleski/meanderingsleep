@@ -1,36 +1,78 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
-import AudioPlayer from '../components/AudioPlayer';
+import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text, Image, ScrollView } from 'react-native';
 import { MainStackParamList } from './types';
-import { useAuth } from '../contexts/AuthContext';
+import { Logo } from '../design-system/components/Logo';
+import AudioPlayer from '../components/AudioPlayer';
 import { colors, typography, spacing } from '../design-system/theme';
 
 const Stack = createStackNavigator<MainStackParamList>();
 
 function MainScreen() {
-  const { signOut } = useAuth();
+  const [showPlayer, setShowPlayer] = useState(false);
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
+  const handleCategoryPress = (category: string) => {
+    console.log(`Pressed ${category}`);
+    setShowPlayer(true);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
-      <View style={styles.header}>
-        <TouchableOpacity 
-          onPress={handleLogout}
-          style={styles.logoutButton}
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary.nocturne} />
+      {showPlayer ? (
+        <AudioPlayer />
+      ) : (
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-      <AudioPlayer />
+          <View style={styles.header}>
+            <Logo />
+          </View>
+          
+          <Text style={styles.greeting}>
+            {getGreeting()}
+          </Text>
+
+          <View style={styles.categoriesContainer}>
+            <TouchableOpacity 
+              style={styles.categoryCard}
+              onPress={() => handleCategoryPress('Meandering Stories')}
+              activeOpacity={0.8}
+            >
+              <Image 
+                source={require('../assets/resources/meandering_story_icon.png')}
+                style={styles.categoryIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.categoryTitle}>Meandering{'\n'}Stories</Text>
+              <Text style={styles.categoryAuthor}>Sally</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.categoryCard}
+              onPress={() => handleCategoryPress('Boring Lectures')}
+              activeOpacity={0.8}
+            >
+              <Image 
+                source={require('../assets/resources/boring_lecture_icon.png')}
+                style={styles.categoryIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.categoryTitle}>Boring{'\n'}Lectures</Text>
+              <Text style={styles.categoryAuthor}>Sally</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
@@ -50,24 +92,55 @@ export function MainStack() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.primary.nocturne,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
+    alignItems: 'center',
+    marginTop: spacing.xl,
+    marginBottom: spacing.xl * 2,
   },
-  logoutButton: {
-    backgroundColor: colors.primary.orchid,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: 20,
-  },
-  logoutText: {
+  greeting: {
+    fontSize: typography.fontSize['3xl'],
+    fontFamily: typography.fontFamily.bold,
     color: colors.primary.white,
-    fontSize: typography.fontSize.md,
-    fontFamily: typography.fontFamily.medium,
+    marginBottom: spacing.xl * 2,
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
+  categoryCard: {
+    flex: 1,
+    backgroundColor: colors.primary.eclipse,
+    borderRadius: 20,
+    padding: spacing.lg,
+    alignItems: 'center',
+    minHeight: 200,
+  },
+  categoryIcon: {
+    width: 60,
+    height: 60,
+    marginBottom: spacing.lg,
+    tintColor: colors.secondary.periwinkle,
+  },
+  categoryTitle: {
+    fontSize: typography.fontSize.lg,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.primary.white,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  categoryAuthor: {
+    fontSize: typography.fontSize.sm,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.secondary.lavender,
   },
 });
