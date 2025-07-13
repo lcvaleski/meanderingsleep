@@ -144,8 +144,18 @@ workflows:
           
           # Set build number (CFBundleVersion)
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
-          NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 10))
-          echo "Latest build number from App Store: $LATEST_BUILD_NUMBER, setting to: $NEW_BUILD_NUMBER"
+          echo "Latest build number from App Store Connect: $LATEST_BUILD_NUMBER"
+          
+          # Ensure we're always incrementing beyond any previous builds
+          # Start from a minimum of 100 to avoid conflicts
+          MIN_BUILD_NUMBER=100
+          if [ -z "$LATEST_BUILD_NUMBER" ] || [ "$LATEST_BUILD_NUMBER" -lt "$MIN_BUILD_NUMBER" ]; then
+            NEW_BUILD_NUMBER=$((MIN_BUILD_NUMBER + $BUILD_NUMBER))
+          else
+            NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 10))
+          fi
+          
+          echo "Setting new build number to: $NEW_BUILD_NUMBER"
           agvtool new-version -all $NEW_BUILD_NUMBER
       
       # Step 6: Build the iOS app and create an IPA package
