@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import RevenueCatService from '../services/RevenueCatService';
 
 interface AuthContextData {
   user: FirebaseAuthTypes.User | null;
@@ -33,8 +34,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       offlineAccess: true,
     });
 
-    const unsubscribe = auth().onAuthStateChanged((_user) => {
+    const unsubscribe = auth().onAuthStateChanged(async (_user) => {
       setUser(_user);
+      
+      // Sync with RevenueCat
+      if (_user) {
+        try {
+          await RevenueCatService.login(_user.uid);
+        } catch (error) {
+          console.error('Failed to sync with RevenueCat:', error);
+        }
+      }
+      
       setLoading(false);
     });
 
@@ -62,6 +73,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       await auth().signOut();
+      // Also logout from RevenueCat
+      await RevenueCatService.logout();
     } catch (error) {
       console.error('Sign out error:', error);
       throw error;
