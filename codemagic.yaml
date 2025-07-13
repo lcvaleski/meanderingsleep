@@ -68,10 +68,20 @@ workflows:
           ./gradlew bundleRelease \
               -PversionCode=$UPDATED_BUILD_NUMBER \
               -PversionName=$APP_VERSION
+      
+      # Step 6: Upload debug symbols to Firebase Crashlytics
+      - name: Upload debug symbols to Firebase Crashlytics
+        script: |
+          echo "Uploading debug symbols to Firebase Crashlytics..."
+          cd android
+          # Upload native debug symbols
+          ./gradlew app:uploadCrashlyticsSymbolFileRelease || echo "Warning: Failed to upload Crashlytics symbols"
     
     # Files to save after build completion
     artifacts:
       - android/app/build/outputs/**/*.aab  # Android App Bundle for release
+      - android/app/build/outputs/**/mapping.txt  # ProGuard/R8 mapping file
+      - android/app/build/intermediates/merged_native_libs/**/out/lib/**/*.so  # Native debug symbols
     
     # Publishing configuration for Google Play Store
     publishing:
@@ -152,6 +162,21 @@ workflows:
           xcode-project build-ipa \
             --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME"
+      
+      # Step 7: Upload dSYM files to Firebase Crashlytics
+      - name: Upload dSYM to Firebase Crashlytics
+        script: |
+          echo "Uploading dSYM files to Firebase Crashlytics..."
+          # Find the dSYM files
+          DSYM_PATH=$(find $HOME/Library/Developer/Xcode/DerivedData -name "*.app.dSYM" | head -1)
+          if [ -n "$DSYM_PATH" ]; then
+            # Upload using Firebase CLI
+            $CM_BUILD_DIR/ios/Pods/FirebaseCrashlytics/upload-symbols \
+              -gsp $CM_BUILD_DIR/ios/MeanderingSleepApp/GoogleService-Info.plist \
+              -p ios $DSYM_PATH || echo "Warning: Failed to upload dSYM to Crashlytics"
+          else
+            echo "Warning: No dSYM file found"
+          fi
     
     # Files to save after build completion
     artifacts:
