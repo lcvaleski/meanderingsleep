@@ -82,7 +82,6 @@ workflows:
         credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS  # From google_credentials group
         track: internal  # Deploy to internal testing track
         submit_as_draft: true  # Upload as draft (requires manual review)
-        changes_not_sent_for_review: true  # Don't auto-submit for review
 
   # iOS Build & Deployment Workflow
   ios-workflow:
