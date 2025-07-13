@@ -45,7 +45,15 @@ workflows:
           # Decode the base64-encoded google-services.json and write it to the correct location
           echo $ANDROID_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/android/app/google-services.json"
       
-      # Step 5: Build the Android release bundle with auto-incremented version number
+      # Step 5: Create .env file with RevenueCat API keys
+      - name: Create .env file
+        script: |
+          echo "REVENUECAT_IOS_API_KEY=$REVENUECAT_IOS_API_KEY" > "$CM_BUILD_DIR/.env"
+          echo "REVENUECAT_ANDROID_API_KEY=$REVENUECAT_ANDROID_API_KEY" >> "$CM_BUILD_DIR/.env"
+          # Create symlink for iOS
+          cd "$CM_BUILD_DIR/ios" && ln -s ../.env .env
+      
+      # Step 6: Build the Android release bundle with auto-incremented version number
       - name: Build Android release
         script: | 
           # Fetch the latest build number from Google Play
@@ -134,7 +142,15 @@ workflows:
           # Decode the base64-encoded GoogleService-Info.plist and write it to the correct location
           echo $IOS_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/ios/MeanderingSleepApp/GoogleService-Info.plist"
       
-      # Step 5: Set version and increment build number based on TestFlight
+      # Step 5: Create .env file with RevenueCat API keys
+      - name: Create .env file
+        script: |
+          echo "REVENUECAT_IOS_API_KEY=$REVENUECAT_IOS_API_KEY" > "$CM_BUILD_DIR/.env"
+          echo "REVENUECAT_ANDROID_API_KEY=$REVENUECAT_ANDROID_API_KEY" >> "$CM_BUILD_DIR/.env"
+          # Create symlink for iOS
+          cd "$CM_BUILD_DIR/ios" && ln -s ../.env .env
+      
+      # Step 6: Set version and increment build number based on TestFlight
       - name: Set version and build number
         script: | 
           #!/bin/sh
