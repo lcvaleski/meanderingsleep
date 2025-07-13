@@ -69,13 +69,6 @@ workflows:
               -PversionCode=$UPDATED_BUILD_NUMBER \
               -PversionName=$APP_VERSION
       
-      # Step 6: Upload debug symbols to Firebase Crashlytics
-      - name: Upload debug symbols to Firebase Crashlytics
-        script: |
-          echo "Uploading debug symbols to Firebase Crashlytics..."
-          cd android
-          # Upload native debug symbols
-          ./gradlew app:uploadCrashlyticsSymbolFileRelease || echo "Warning: Failed to upload Crashlytics symbols"
     
     # Files to save after build completion
     artifacts:
