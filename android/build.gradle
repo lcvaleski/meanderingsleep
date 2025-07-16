@@ -6,6 +6,7 @@ buildscript {
         targetSdkVersion = 34
         ndkVersion = "25.1.8937393"
         kotlinVersion = "1.8.0"
+        androidXCoreVersion = "1.13.1"
     }
     repositories {
         google()
@@ -21,3 +22,12 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force "androidx.core:core:${rootProject.ext.androidXCoreVersion}"
+            force "androidx.core:core-ktx:${rootProject.ext.androidXCoreVersion}"
+        }
+    }
+}
