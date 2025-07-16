@@ -26,6 +26,12 @@ class GoogleStorageService {
     return `${this.bucketUrl}/${filename}`;
   }
   
+  // Get URL for a library audio file by ID
+  getLibraryAudioUrl(id: string, topic: string, gender: 'male' | 'female'): string {
+    const filename = `${id}_${topic}_${gender}.mp3`;
+    return `${this.bucketUrl}/archive/${filename}`;
+  }
+  
   // Get current day of week
   getCurrentDay(): string {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

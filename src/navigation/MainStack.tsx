@@ -9,6 +9,7 @@ import RevenueCatService from '../services/RevenueCatService';
 import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import crashlytics from '@react-native-firebase/crashlytics';
 import GoogleStorageService from '../services/GoogleStorageService';
+import { LibraryScreen } from '../screens/LibraryScreen';
 
 const Stack = createStackNavigator<MainStackParamList>();
 
@@ -17,6 +18,8 @@ function MainScreen() {
   const [selectedAudioUrl, setSelectedAudioUrl] = useState<string>('');
   const [selectedAudioTitle, setSelectedAudioTitle] = useState<string>('');
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('female');
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [libraryTopic, setLibraryTopic] = useState<'meandering' | 'boring'>('meandering');
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -174,7 +177,47 @@ function MainScreen() {
               <Text style={styles.categoryTitle}>Boring{'\n'}Lectures</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Library Buttons */}
+          <View style={styles.libraryButtonsContainer}>
+            <TouchableOpacity
+              style={styles.libraryButton}
+              onPress={() => {
+                setLibraryTopic('meandering');
+                setShowLibrary(true);
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.libraryButtonText}>View All Meandering Stories</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.libraryButton}
+              onPress={() => {
+                setLibraryTopic('boring');
+                setShowLibrary(true);
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.libraryButtonText}>View All Boring Lectures</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
+      )}
+
+      {/* Library Screen Modal */}
+      {showLibrary && (
+        <LibraryScreen
+          selectedTopic={libraryTopic}
+          selectedGender={selectedGender}
+          onSelectAudio={(url, title) => {
+            setSelectedAudioUrl(url);
+            setSelectedAudioTitle(title);
+            setShowLibrary(false);
+            setShowPlayer(true);
+          }}
+          onBack={() => setShowLibrary(false)}
+        />
       )}
     </SafeAreaView>
   );
@@ -305,5 +348,22 @@ const styles = StyleSheet.create({
   genderButtonTextActive: {
     color: colors.primary.white,
     fontFamily: typography.fontFamily.bold,
+  },
+  libraryButtonsContainer: {
+    marginTop: spacing.xl,
+    gap: spacing.md,
+  },
+  libraryButton: {
+    backgroundColor: colors.primary.blueberry,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  libraryButtonText: {
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.primary.white,
   },
 });
