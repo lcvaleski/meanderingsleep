@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import initializeFirebase from './src/config/firebase';
 import crashlytics from '@react-native-firebase/crashlytics';
 import RevenueCatService from './src/services/RevenueCatService';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
 // Initialize Firebase on app start
 initializeFirebase();
@@ -12,12 +13,28 @@ initializeFirebase();
 crashlytics().setCrashlyticsCollectionEnabled(true);
 
 function App(): React.JSX.Element {
+  const [isRevenueCatReady, setIsRevenueCatReady] = useState(false);
+
   useEffect(() => {
     // Initialize RevenueCat
-    RevenueCatService.initialize().catch(error => {
-      console.error('Failed to initialize RevenueCat:', error);
-    });
+    RevenueCatService.initialize()
+      .then(() => {
+        setIsRevenueCatReady(true);
+      })
+      .catch(error => {
+        console.error('Failed to initialize RevenueCat:', error);
+        // Still allow app to load even if RevenueCat fails
+        setIsRevenueCatReady(true);
+      });
   }, []);
+
+  if (!isRevenueCatReady) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
   return (
     <AuthProvider>
@@ -25,5 +42,14 @@ function App(): React.JSX.Element {
     </AuthProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+});
 
 export default App;

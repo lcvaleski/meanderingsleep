@@ -116,6 +116,11 @@ class RevenueCatService {
   }
 
   async presentPaywall(): Promise<PAYWALL_RESULT> {
+    if (!this.initialized) {
+      console.error('RevenueCat not initialized. Cannot present paywall.');
+      throw new Error('RevenueCat must be initialized before presenting paywall');
+    }
+    
     try {
       const paywallResult = await RevenueCatUI.presentPaywall();
       console.log('Paywall result:', paywallResult);
@@ -127,6 +132,11 @@ class RevenueCatService {
   }
 
   async presentPaywallIfNeeded(requiredEntitlementIdentifier?: string): Promise<PAYWALL_RESULT> {
+    if (!this.initialized) {
+      console.error('RevenueCat not initialized. Cannot present paywall.');
+      throw new Error('RevenueCat must be initialized before presenting paywall');
+    }
+    
     try {
       const paywallResult = await RevenueCatUI.presentPaywallIfNeeded(
         requiredEntitlementIdentifier ? { requiredEntitlementIdentifier } : undefined as any
