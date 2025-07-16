@@ -17,12 +17,16 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     // Initialize RevenueCat
+    crashlytics().log('App starting - initializing RevenueCat');
     RevenueCatService.initialize()
       .then(() => {
+        crashlytics().log('RevenueCat initialization complete in App.tsx');
         setIsRevenueCatReady(true);
       })
       .catch(error => {
         console.error('Failed to initialize RevenueCat:', error);
+        crashlytics().log(`Failed to initialize RevenueCat in App.tsx: ${error}`);
+        crashlytics().recordError(error instanceof Error ? error : new Error(String(error)));
         // Still allow app to load even if RevenueCat fails
         setIsRevenueCatReady(true);
       });

@@ -7,6 +7,7 @@ import AudioPlayer from '../components/AudioPlayer';
 import { colors, typography, spacing } from '../design-system/theme';
 import RevenueCatService from '../services/RevenueCatService';
 import { PAYWALL_RESULT } from 'react-native-purchases-ui';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const Stack = createStackNavigator<MainStackParamList>();
 
@@ -22,34 +23,50 @@ function MainScreen() {
 
   const handleCategoryPress = async (category: string) => {
     console.log(`Pressed ${category}`);
+    crashlytics().log(`Category pressed: ${category}`);
     
     // Check if user has subscription before allowing access
     // You can customize this based on your entitlement names in RevenueCat
     try {
+      crashlytics().log('Calling presentPaywallIfNeeded with entitlement: premium');
       const result = await RevenueCatService.presentPaywallIfNeeded('premium');
+      crashlytics().log(`Paywall result: ${result}`);
+      
       if (result === PAYWALL_RESULT.NOT_PRESENTED) {
         // User has active subscription, proceed
+        crashlytics().log('User has active subscription, showing player');
         setShowPlayer(true);
       } else if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
         // User just purchased/restored, proceed
+        crashlytics().log('Purchase/restore successful, showing player');
         setShowPlayer(true);
       }
       // If cancelled or error, don't show player
     } catch (error) {
       console.error('Error checking subscription:', error);
+      crashlytics().log(`Error in handleCategoryPress: ${error}`);
+      crashlytics().recordError(error instanceof Error ? error : new Error(String(error)));
     }
   };
 
   const handleSubscribePress = async () => {
+    crashlytics().log('Subscribe button pressed');
     try {
+      crashlytics().log('Calling presentPaywall');
       const result = await RevenueCatService.presentPaywall();
+      crashlytics().log(`Paywall presentation result: ${result}`);
+      
       if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
         console.log('Purchase or restore successful');
+        crashlytics().log('Purchase or restore successful');
       } else if (result === PAYWALL_RESULT.CANCELLED) {
         console.log('User cancelled the paywall');
+        crashlytics().log('User cancelled the paywall');
       }
     } catch (error) {
       console.error('Error presenting paywall:', error);
+      crashlytics().log(`Error in handleSubscribePress: ${error}`);
+      crashlytics().recordError(error instanceof Error ? error : new Error(String(error)));
     }
   };
 
