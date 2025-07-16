@@ -5,6 +5,8 @@ import { MainStackParamList } from './types';
 import { Logo } from '../design-system/components/Logo';
 import AudioPlayer from '../components/AudioPlayer';
 import { colors, typography, spacing } from '../design-system/theme';
+import RevenueCatService from '../services/RevenueCatService';
+import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 
 const Stack = createStackNavigator<MainStackParamList>();
 
@@ -18,9 +20,37 @@ function MainScreen() {
     return 'Good Evening';
   };
 
-  const handleCategoryPress = (category: string) => {
+  const handleCategoryPress = async (category: string) => {
     console.log(`Pressed ${category}`);
-    setShowPlayer(true);
+    
+    // Check if user has subscription before allowing access
+    // You can customize this based on your entitlement names in RevenueCat
+    try {
+      const result = await RevenueCatService.presentPaywallIfNeeded('premium');
+      if (result === PAYWALL_RESULT.NOT_PRESENTED) {
+        // User has active subscription, proceed
+        setShowPlayer(true);
+      } else if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
+        // User just purchased/restored, proceed
+        setShowPlayer(true);
+      }
+      // If cancelled or error, don't show player
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+    }
+  };
+
+  const handleSubscribePress = async () => {
+    try {
+      const result = await RevenueCatService.presentPaywall();
+      if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
+        console.log('Purchase or restore successful');
+      } else if (result === PAYWALL_RESULT.CANCELLED) {
+        console.log('User cancelled the paywall');
+      }
+    } catch (error) {
+      console.error('Error presenting paywall:', error);
+    }
   };
 
   return (
@@ -45,6 +75,13 @@ function MainScreen() {
         >
           <View style={styles.header}>
             <Logo />
+            <TouchableOpacity 
+              style={styles.subscribeButton}
+              onPress={handleSubscribePress}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.subscribeButtonText}>Unlock Premium</Text>
+            </TouchableOpacity>
           </View>
           
           <Text style={styles.greeting}>
@@ -163,5 +200,17 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.lg,
     fontFamily: typography.fontFamily.medium,
     color: colors.primary.orchid,
+  },
+  subscribeButton: {
+    marginTop: spacing.lg,
+    backgroundColor: colors.primary.orchid,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: 25,
+  },
+  subscribeButtonText: {
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.primary.white,
   },
 });

@@ -3,6 +3,7 @@ import Purchases, {
   PurchasesPackage,
   LOG_LEVEL,
 } from 'react-native-purchases';
+import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import { Platform } from 'react-native';
 import Config from 'react-native-config';
 
@@ -111,6 +112,30 @@ class RevenueCatService {
     } catch (error) {
       console.error('Error checking subscription status:', error);
       return false;
+    }
+  }
+
+  async presentPaywall(): Promise<PAYWALL_RESULT> {
+    try {
+      const paywallResult = await RevenueCatUI.presentPaywall();
+      console.log('Paywall result:', paywallResult);
+      return paywallResult;
+    } catch (error) {
+      console.error('Error presenting paywall:', error);
+      throw error;
+    }
+  }
+
+  async presentPaywallIfNeeded(requiredEntitlementIdentifier?: string): Promise<PAYWALL_RESULT> {
+    try {
+      const paywallResult = await RevenueCatUI.presentPaywallIfNeeded(
+        requiredEntitlementIdentifier ? { requiredEntitlementIdentifier } : undefined as any
+      );
+      console.log('Paywall result:', paywallResult);
+      return paywallResult;
+    } catch (error) {
+      console.error('Error presenting paywall if needed:', error);
+      throw error;
     }
   }
 }
