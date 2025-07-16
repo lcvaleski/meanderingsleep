@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text, Image, ScrollView } from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text, Image, ScrollView, Alert } from 'react-native';
 import { MainStackParamList } from './types';
 import { Logo } from '../design-system/components/Logo';
 import AudioPlayer from '../components/AudioPlayer';
@@ -8,11 +8,15 @@ import { colors, typography, spacing } from '../design-system/theme';
 import RevenueCatService from '../services/RevenueCatService';
 import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import crashlytics from '@react-native-firebase/crashlytics';
+import GoogleStorageService from '../services/GoogleStorageService';
 
 const Stack = createStackNavigator<MainStackParamList>();
 
 function MainScreen() {
   const [showPlayer, setShowPlayer] = useState(false);
+  const [selectedAudioUrl, setSelectedAudioUrl] = useState<string>('');
+  const [selectedAudioTitle, setSelectedAudioTitle] = useState<string>('');
+  const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('female');
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -25,28 +29,33 @@ function MainScreen() {
     console.log(`Pressed ${category}`);
     crashlytics().log(`Category pressed: ${category}`);
     
-    // Check if user has subscription before allowing access
-    // You can customize this based on your entitlement names in RevenueCat
-    try {
-      crashlytics().log('Calling presentPaywallIfNeeded with entitlement: premium');
-      const result = await RevenueCatService.presentPaywallIfNeeded('premium');
-      crashlytics().log(`Paywall result: ${result}`);
+    // TEMPORARILY DISABLED PAYWALL FOR TESTING
+    // Test Google Storage connection first
+    const isConnected = await GoogleStorageService.testConnection();
+    console.log('Google Storage connected:', isConnected);
+    
+    if (isConnected) {
+      // Play today's audio with selected gender
+      const currentDay = GoogleStorageService.getCurrentDay();
+      const audioType = category.toLowerCase().includes('boring') ? 'boring' : 'meandering';
+      const audioUrl = GoogleStorageService.getDailyAudioUrl(currentDay, audioType, selectedGender);
       
-      if (result === PAYWALL_RESULT.NOT_PRESENTED) {
-        // User has active subscription, proceed
-        crashlytics().log('User has active subscription, showing player');
-        setShowPlayer(true);
-      } else if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
-        // User just purchased/restored, proceed
-        crashlytics().log('Purchase/restore successful, showing player');
-        setShowPlayer(true);
-      }
-      // If cancelled or error, don't show player
-    } catch (error) {
-      console.error('Error checking subscription:', error);
-      crashlytics().log(`Error in handleCategoryPress: ${error}`);
-      crashlytics().recordError(error instanceof Error ? error : new Error(String(error)));
+      console.log('Audio URL:', audioUrl);
+      
+      // Set the audio info and show player
+      setSelectedAudioUrl(audioUrl);
+      setSelectedAudioTitle(`${currentDay} ${audioType === 'boring' ? 'Boring Lecture' : 'Meandering Story'}`);
+      setShowPlayer(true);
+    } else {
+      Alert.alert('Connection Error', 'Unable to connect to audio service. Please check your internet connection.');
     }
+    
+    // PAYWALL CODE COMMENTED OUT FOR TESTING
+    // try {
+    //   crashlytics().log('Calling presentPaywallIfNeeded with entitlement: premium');
+    //   const result = await RevenueCatService.presentPaywallIfNeeded('premium');
+    //   ...
+    // }
   };
 
   const handleSubscribePress = async () => {
@@ -82,7 +91,7 @@ function MainScreen() {
           >
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
-          <AudioPlayer />
+          <AudioPlayer trackUrl={selectedAudioUrl} trackTitle={selectedAudioTitle} />
         </View>
       ) : (
         <ScrollView 
@@ -105,6 +114,39 @@ function MainScreen() {
             {getGreeting()}
           </Text>
 
+          {/* Gender Selection */}
+          <View style={styles.genderContainer}>
+            <Text style={styles.genderLabel}>Select Voice:</Text>
+            <View style={styles.genderButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.genderButton,
+                  selectedGender === 'female' && styles.genderButtonActive
+                ]}
+                onPress={() => setSelectedGender('female')}
+                activeOpacity={0.7}
+              >
+                <Text style={[
+                  styles.genderButtonText,
+                  selectedGender === 'female' && styles.genderButtonTextActive
+                ]}>Female</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.genderButton,
+                  selectedGender === 'male' && styles.genderButtonActive
+                ]}
+                onPress={() => setSelectedGender('male')}
+                activeOpacity={0.7}
+              >
+                <Text style={[
+                  styles.genderButtonText,
+                  selectedGender === 'male' && styles.genderButtonTextActive
+                ]}>Male</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <View style={styles.categoriesContainer}>
             <TouchableOpacity 
               style={styles.categoryCard}
@@ -117,7 +159,6 @@ function MainScreen() {
                 resizeMode="contain"
               />
               <Text style={styles.categoryTitle}>Meandering{'\n'}Stories</Text>
-              <Text style={styles.categoryAuthor}>Sally</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -131,7 +172,6 @@ function MainScreen() {
                 resizeMode="contain"
               />
               <Text style={styles.categoryTitle}>Boring{'\n'}Lectures</Text>
-              <Text style={styles.categoryAuthor}>Sally</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -229,5 +269,41 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.md,
     fontFamily: typography.fontFamily.bold,
     color: colors.primary.white,
+  },
+  genderContainer: {
+    marginBottom: spacing.xl,
+  },
+  genderLabel: {
+    fontSize: typography.fontSize.lg,
+    fontFamily: typography.fontFamily.medium,
+    color: colors.primary.white,
+    marginBottom: spacing.md,
+  },
+  genderButtons: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  genderButton: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: 12,
+    backgroundColor: colors.primary.eclipse,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  genderButtonActive: {
+    borderColor: colors.primary.orchid,
+    backgroundColor: colors.primary.blueberry,
+  },
+  genderButtonText: {
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.medium,
+    color: colors.secondary.lavender,
+    textAlign: 'center',
+  },
+  genderButtonTextActive: {
+    color: colors.primary.white,
+    fontFamily: typography.fontFamily.bold,
   },
 });
