@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Alert, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../design-system/components/Button';
 import { EnhancedInput } from '../../components/EnhancedInput';
@@ -43,7 +43,6 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
       </Text>
       <EnhancedInput
         label="Email"
-        placeholder="Enter your email address"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
@@ -61,13 +60,12 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
         loading={loading}
         disabled={!email || loading}
       />
-      <Button
-        title="Back to Login"
+      <TouchableOpacity
         onPress={() => navigation.goBack()}
-        variant="secondary"
-        size="small"
         style={styles.backLink}
-      />
+      >
+        <Text style={styles.backLinkText}>Back to Login</Text>
+      </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -105,5 +103,12 @@ const styles = StyleSheet.create({
   },
   backLink: {
     marginTop: spacing.lg,
+    alignSelf: 'center',
+  },
+  backLinkText: {
+    color: colors.primary.white,
+    fontSize: typography.fontSize.sm,
+    textDecorationLine: 'underline',
+    fontFamily: typography.fontFamily.medium,
   },
 }); 

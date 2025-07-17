@@ -140,7 +140,7 @@ export const LoginScreen = () => {
           <Image
             source={require('../../assets/google-icon.png')}
             style={styles.socialIcon}
-            resizeMode="contain"
+            resizeMode="center"
           />
           <Text style={styles.socialButtonText}>Sign in with Google</Text>
         </TouchableOpacity>
@@ -172,13 +172,16 @@ const styles = StyleSheet.create({
   },
   container: {
     flexGrow: 1,
-    padding: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xl * 2,
     justifyContent: 'center',
   },
   title: {
-    fontSize: typography.fontSize['2xl'],
+    fontSize: typography.fontSize['3xl'],
     fontFamily: typography.fontFamily.bold,
-    marginBottom: spacing.xl,
+    fontWeight: '700',
+    marginBottom: spacing.xl * 2,
+    marginTop: spacing.xl,
     textAlign: 'center',
     color: colors.primary.white,
   },
@@ -190,7 +193,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   forgotPasswordText: {
-    color: colors.primary.orchid,
+    color: colors.primary.white,
     fontSize: typography.fontSize.sm,
     textDecorationLine: 'underline',
     fontFamily: typography.fontFamily.medium,
@@ -205,8 +208,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   signUpTextBold: {
-    color: colors.primary.orchid,
+    color: colors.primary.white,
     fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
   errorText: {
     color: colors.secondary.coral,
@@ -218,16 +222,16 @@ const styles = StyleSheet.create({
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: spacing.lg,
+    marginVertical: spacing.xl,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: colors.primary.blueberry,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   dividerText: {
-    marginHorizontal: spacing.sm,
-    color: colors.primary.white,
+    marginHorizontal: spacing.md,
+    color: 'rgba(255, 255, 255, 0.6)',
     fontFamily: typography.fontFamily.medium,
     fontSize: typography.fontSize.sm,
   },
@@ -243,13 +247,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primary.blueberry,
-    borderRadius: 24,
-    paddingVertical: 12,
-    width: '90%',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 12,
+    paddingVertical: spacing.md,
+    width: '100%',
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: colors.primary.blueberry,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   socialIcon: {
     width: 20,
