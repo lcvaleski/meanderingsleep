@@ -9,7 +9,6 @@ import RevenueCatService from '../services/RevenueCatService';
 import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import crashlytics from '@react-native-firebase/crashlytics';
 import GoogleStorageService from '../services/GoogleStorageService';
-import { LibraryScreen } from '../screens/LibraryScreen';
 import { useAuth } from '../contexts/AuthContext';
 
 const Stack = createStackNavigator<MainStackParamList>();
@@ -20,8 +19,7 @@ function MainScreen() {
   const [selectedAudioUrl, setSelectedAudioUrl] = useState<string>('');
   const [selectedAudioTitle, setSelectedAudioTitle] = useState<string>('');
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('female');
-  const [showLibrary, setShowLibrary] = useState(false);
-  const [libraryTopic, setLibraryTopic] = useState<'meandering' | 'boring'>('meandering');
+  const [showGenderSelector, setShowGenderSelector] = useState(false);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -153,42 +151,60 @@ function MainScreen() {
             {getGreeting()}
           </Text>
 
-          {/* Gender Selection */}
-          <View style={styles.genderContainer}>
-            <Text style={styles.genderLabel}>Select Voice:</Text>
-            <View style={styles.genderButtons}>
+          {/* Your Daily Section */}
+          <View style={styles.dailySection}>
+            <Text style={styles.dailyLabel}>Your Daily</Text>
+            <TouchableOpacity 
+              style={styles.readerDropdown} 
+              activeOpacity={0.7}
+              onPress={() => setShowGenderSelector(!showGenderSelector)}
+            >
+              <Text style={styles.readerText}>{selectedGender === 'female' ? 'Sally' : 'Sam'}</Text>
+              <Text style={styles.dropdownArrow}>⌄</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Gender Selector Dropdown */}
+          {showGenderSelector && (
+            <View style={styles.genderDropdown}>
               <TouchableOpacity
                 style={[
-                  styles.genderButton,
-                  selectedGender === 'female' && styles.genderButtonActive
+                  styles.genderOption,
+                  selectedGender === 'female' && styles.genderOptionActive
                 ]}
-                onPress={() => setSelectedGender('female')}
+                onPress={() => {
+                  setSelectedGender('female');
+                  setShowGenderSelector(false);
+                }}
                 activeOpacity={0.7}
               >
                 <Text style={[
-                  styles.genderButtonText,
-                  selectedGender === 'female' && styles.genderButtonTextActive
-                ]}>Female</Text>
+                  styles.genderOptionText,
+                  selectedGender === 'female' && styles.genderOptionTextActive
+                ]}>Sally (Female)</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
-                  styles.genderButton,
-                  selectedGender === 'male' && styles.genderButtonActive
+                  styles.genderOption,
+                  selectedGender === 'male' && styles.genderOptionActive
                 ]}
-                onPress={() => setSelectedGender('male')}
+                onPress={() => {
+                  setSelectedGender('male');
+                  setShowGenderSelector(false);
+                }}
                 activeOpacity={0.7}
               >
                 <Text style={[
-                  styles.genderButtonText,
-                  selectedGender === 'male' && styles.genderButtonTextActive
-                ]}>Male</Text>
+                  styles.genderOptionText,
+                  selectedGender === 'male' && styles.genderOptionTextActive
+                ]}>Sam (Male)</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          )}
 
           <View style={styles.categoriesContainer}>
             <TouchableOpacity 
-              style={styles.categoryCard}
+              style={[styles.categoryCard, styles.meanderingCard]}
               onPress={() => handleCategoryPress('Meandering Stories')}
               activeOpacity={0.8}
             >
@@ -197,11 +213,14 @@ function MainScreen() {
                 style={styles.categoryIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.categoryTitle}>Meandering{'\n'}Stories</Text>
+              <View style={styles.categoryTextContainer}>
+                <Text style={styles.categoryTitle}>Meandering</Text>
+                <Text style={styles.categoryTitle}>Stories</Text>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={styles.categoryCard}
+              style={[styles.categoryCard, styles.boringCard]}
               onPress={() => handleCategoryPress('Boring Lectures')}
               activeOpacity={0.8}
             >
@@ -210,51 +229,16 @@ function MainScreen() {
                 style={styles.categoryIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.categoryTitle}>Boring{'\n'}Lectures</Text>
+              <View style={styles.categoryTextContainer}>
+                <Text style={styles.categoryTitle}>Boring</Text>
+                <Text style={styles.categoryTitle}>Lectures</Text>
+              </View>
             </TouchableOpacity>
           </View>
 
-          {/* Library Buttons */}
-          <View style={styles.libraryButtonsContainer}>
-            <TouchableOpacity
-              style={styles.libraryButton}
-              onPress={() => {
-                setLibraryTopic('meandering');
-                setShowLibrary(true);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.libraryButtonText}>View All Meandering Stories</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={styles.libraryButton}
-              onPress={() => {
-                setLibraryTopic('boring');
-                setShowLibrary(true);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.libraryButtonText}>View All Boring Lectures</Text>
-            </TouchableOpacity>
-          </View>
         </ScrollView>
       )}
 
-      {/* Library Screen Modal */}
-      {showLibrary && (
-        <LibraryScreen
-          selectedTopic={libraryTopic}
-          selectedGender={selectedGender}
-          onSelectAudio={(url, title) => {
-            setSelectedAudioUrl(url);
-            setSelectedAudioTitle(title);
-            setShowLibrary(false);
-            setShowPlayer(true);
-          }}
-          onBack={() => setShowLibrary(false)}
-        />
-      )}
     </SafeAreaView>
   );
 }
@@ -301,23 +285,35 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     flex: 1,
-    backgroundColor: colors.primary.eclipse,
-    borderRadius: 20,
+    borderRadius: 16,
     padding: spacing.lg,
-    alignItems: 'center',
-    minHeight: 200,
+    minHeight: 180,
+    position: 'relative',
+  },
+  meanderingCard: {
+    backgroundColor: '#3D3471',
+  },
+  boringCard: {
+    backgroundColor: '#3D3471',
   },
   categoryIcon: {
-    width: 60,
-    height: 60,
-    marginBottom: spacing.lg,
+    width: 48,
+    height: 48,
+    position: 'absolute',
+    top: spacing.lg,
+    left: spacing.lg,
+  },
+  categoryTextContainer: {
+    position: 'absolute',
+    bottom: spacing.lg,
+    left: spacing.lg,
   },
   categoryTitle: {
-    fontSize: typography.fontSize.lg,
+    fontSize: typography.fontSize.xl,
     fontFamily: typography.fontFamily.bold,
     color: colors.primary.white,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
+    textAlign: 'left',
+    lineHeight: 26,
   },
   categoryAuthor: {
     fontSize: typography.fontSize.sm,
@@ -366,57 +362,64 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.bold,
     color: colors.secondary.lavender,
   },
-  genderContainer: {
-    marginBottom: spacing.xl,
+  genderDropdown: {
+    position: 'absolute',
+    top: 150,
+    right: spacing.lg,
+    backgroundColor: colors.primary.eclipse,
+    borderRadius: 12,
+    paddingVertical: spacing.sm,
+    minWidth: 150,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 1000,
   },
-  genderLabel: {
-    fontSize: typography.fontSize.lg,
-    fontFamily: typography.fontFamily.medium,
-    color: colors.primary.white,
-    marginBottom: spacing.md,
-  },
-  genderButtons: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  genderButton: {
-    flex: 1,
+  genderOption: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    borderRadius: 12,
-    backgroundColor: colors.primary.eclipse,
-    borderWidth: 2,
-    borderColor: 'transparent',
   },
-  genderButtonActive: {
-    borderColor: colors.primary.orchid,
-    backgroundColor: colors.primary.blueberry,
+  genderOptionActive: {
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
   },
-  genderButtonText: {
+  genderOptionText: {
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.primary.white,
+  },
+  genderOptionTextActive: {
+    fontFamily: typography.fontFamily.bold,
+    color: colors.primary.orchid,
+  },
+  dailySection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+  },
+  dailyLabel: {
     fontSize: typography.fontSize.md,
     fontFamily: typography.fontFamily.medium,
-    color: colors.secondary.lavender,
-    textAlign: 'center',
-  },
-  genderButtonTextActive: {
     color: colors.primary.white,
-    fontFamily: typography.fontFamily.bold,
   },
-  libraryButtonsContainer: {
-    marginTop: spacing.xl,
-    gap: spacing.md,
-  },
-  libraryButton: {
-    backgroundColor: colors.primary.blueberry,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    borderRadius: 16,
+  readerDropdown: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: 8,
   },
-  libraryButtonText: {
-    fontSize: typography.fontSize.md,
-    fontFamily: typography.fontFamily.bold,
+  readerText: {
+    fontSize: typography.fontSize.sm,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.primary.white,
+    marginRight: spacing.xs,
+  },
+  dropdownArrow: {
+    fontSize: typography.fontSize.sm,
     color: colors.primary.white,
   },
 });
