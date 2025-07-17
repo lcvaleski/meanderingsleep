@@ -10,10 +10,12 @@ import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import crashlytics from '@react-native-firebase/crashlytics';
 import GoogleStorageService from '../services/GoogleStorageService';
 import { LibraryScreen } from '../screens/LibraryScreen';
+import { useAuth } from '../contexts/AuthContext';
 
 const Stack = createStackNavigator<MainStackParamList>();
 
 function MainScreen() {
+  const { signOut } = useAuth();
   const [showPlayer, setShowPlayer] = useState(false);
   const [selectedAudioUrl, setSelectedAudioUrl] = useState<string>('');
   const [selectedAudioTitle, setSelectedAudioTitle] = useState<string>('');
@@ -82,6 +84,31 @@ function MainScreen() {
     }
   };
 
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+            } catch (error) {
+              console.error('Error signing out:', error);
+              Alert.alert('Error', 'Failed to logout. Please try again.');
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primary.nocturne} />
@@ -104,13 +131,22 @@ function MainScreen() {
         >
           <View style={styles.header}>
             <Logo />
-            <TouchableOpacity 
-              style={styles.subscribeButton}
-              onPress={handleSubscribePress}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.subscribeButtonText}>Unlock Premium</Text>
-            </TouchableOpacity>
+            <View style={styles.headerButtons}>
+              <TouchableOpacity 
+                style={styles.subscribeButton}
+                onPress={handleSubscribePress}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.subscribeButtonText}>Unlock Premium</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.logoutButton}
+                onPress={handleLogout}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.logoutButtonText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
           </View>
           
           <Text style={styles.greeting}>
@@ -301,8 +337,12 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.medium,
     color: colors.primary.orchid,
   },
-  subscribeButton: {
+  headerButtons: {
+    flexDirection: 'row',
+    gap: spacing.md,
     marginTop: spacing.lg,
+  },
+  subscribeButton: {
     backgroundColor: colors.primary.orchid,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md,
@@ -312,6 +352,19 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.md,
     fontFamily: typography.fontFamily.bold,
     color: colors.primary.white,
+  },
+  logoutButton: {
+    backgroundColor: colors.primary.eclipse,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: colors.secondary.lavender,
+  },
+  logoutButtonText: {
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.secondary.lavender,
   },
   genderContainer: {
     marginBottom: spacing.xl,

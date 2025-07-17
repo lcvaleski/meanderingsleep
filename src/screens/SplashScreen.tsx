@@ -14,9 +14,10 @@ export const SplashScreen = () => {
   const navigation = useNavigation<SplashScreenNavigationProp>();
   return (
     <LinearGradient
-      colors={['#838ACA', '#2E2464']}
+      colors={['#2E2464', '#838ACA']}
+      locations={[0.0729, 0.9266]}
       start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
+      end={{ x: 0.5, y: 1.1066 }}
       style={styles.gradient}
     >
       {/* Clouds (furthest back) */}
@@ -59,59 +60,67 @@ const styles = StyleSheet.create({
   },
   clouds: {
     position: 'absolute',
-    bottom: 0,
-    width: width,
-    resizeMode: 'cover',
+    bottom: -40,
+    width: width * 1.3,
+    left: '50%',
+    transform: [{ translateX: -width * 0.65 }],
+    resizeMode: 'contain',
     zIndex: 0,
   },
   hill1: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    width: width,
-    resizeMode: 'cover',
+    bottom: -60,
+    left: -width * 0.37,
+    width: width * 1.66,
+    height: width * 0.36,
+    resizeMode: 'contain',
     zIndex: 1,
   },
   hill2: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    width: width,
-    resizeMode: 'cover',
+    bottom: -60,
+    left: -width * 0.32,
+    width: width * 1.66,
+    height: width * 0.36,
+    resizeMode: 'contain',
     zIndex: 2,
-
+    transform: [{ scaleX: -1 }],
   },
   hill3: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    width: width,
-    resizeMode: 'cover',
+    bottom: -80,
+    left: width * 0.1,
+    width: width * 1.66,
+    height: width * 0.36,
+    resizeMode: 'contain',
     zIndex: 3,
-
   },
   centerContent: {
     position: 'absolute',
-    top: height * 0.22,
-    width: '100%',
+    top: '50%',
+    left: 0,
+    right: 0,
+    transform: [{ translateY: -height * 0.2 }],
     alignItems: 'center',
     zIndex: 10,
   },
   logo: {
-    width: 75,
-    height: 75,
-    marginBottom: 24,
+    width: 63,
+    height: 65,
+    marginBottom: 30,
     resizeMode: 'contain',
   },
   logoText: {
-    width: 260,
-    height: 48,
+    width: 305,
+    height: 36,
     resizeMode: 'contain',
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: height * 0.4, // just above the clouds
-    width: '100%',
+    top: '50%',
+    left: 0,
+    right: 0,
+    transform: [{ translateY: height * 0.02 }],
     alignItems: 'center',
     zIndex: 20,
   },
