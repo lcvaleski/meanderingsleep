@@ -129,22 +129,6 @@ function MainScreen() {
         >
           <View style={styles.header}>
             <Logo />
-            <View style={styles.headerButtons}>
-              <TouchableOpacity 
-                style={styles.subscribeButton}
-                onPress={handleSubscribePress}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.subscribeButtonText}>Unlock Premium</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.logoutButton}
-                onPress={handleLogout}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.logoutButtonText}>Logout</Text>
-              </TouchableOpacity>
-            </View>
           </View>
           
           <Text style={styles.greeting}>
@@ -154,19 +138,18 @@ function MainScreen() {
           {/* Your Daily Section */}
           <View style={styles.dailySection}>
             <Text style={styles.dailyLabel}>Your Daily</Text>
-            <TouchableOpacity 
-              style={styles.readerDropdown} 
-              activeOpacity={0.7}
-              onPress={() => setShowGenderSelector(!showGenderSelector)}
-            >
-              <Text style={styles.readerText}>{selectedGender === 'female' ? 'Sally' : 'Sam'}</Text>
-              <Text style={styles.dropdownArrow}>⌄</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Gender Selector Dropdown */}
-          {showGenderSelector && (
-            <View style={styles.genderDropdown}>
+            <View style={styles.dropdownContainer}>
+              <TouchableOpacity 
+                style={styles.readerDropdown} 
+                activeOpacity={0.7}
+                onPress={() => setShowGenderSelector(!showGenderSelector)}
+              >
+                <Text style={styles.readerText}>{selectedGender === 'female' ? 'Female' : 'Male'}</Text>
+              </TouchableOpacity>
+              
+              {/* Gender Selector Dropdown */}
+              {showGenderSelector && (
+                <View style={styles.genderDropdown}>
               <TouchableOpacity
                 style={[
                   styles.genderOption,
@@ -181,7 +164,7 @@ function MainScreen() {
                 <Text style={[
                   styles.genderOptionText,
                   selectedGender === 'female' && styles.genderOptionTextActive
-                ]}>Sally (Female)</Text>
+                ]}>Female</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -197,10 +180,12 @@ function MainScreen() {
                 <Text style={[
                   styles.genderOptionText,
                   selectedGender === 'male' && styles.genderOptionTextActive
-                ]}>Sam (Male)</Text>
+                ]}>Male</Text>
               </TouchableOpacity>
+                </View>
+              )}
             </View>
-          )}
+          </View>
 
           <View style={styles.categoriesContainer}>
             <TouchableOpacity 
@@ -216,6 +201,7 @@ function MainScreen() {
               <View style={styles.categoryTextContainer}>
                 <Text style={styles.categoryTitle}>Meandering</Text>
                 <Text style={styles.categoryTitle}>Stories</Text>
+                <Text style={styles.genderText}>{selectedGender === 'female' ? 'Female' : 'Male'}</Text>
               </View>
             </TouchableOpacity>
 
@@ -232,10 +218,28 @@ function MainScreen() {
               <View style={styles.categoryTextContainer}>
                 <Text style={styles.categoryTitle}>Boring</Text>
                 <Text style={styles.categoryTitle}>Lectures</Text>
+                <Text style={styles.genderText}>{selectedGender === 'female' ? 'Female' : 'Male'}</Text>
               </View>
             </TouchableOpacity>
           </View>
 
+          {/* Bottom Buttons */}
+          <View style={styles.bottomButtons}>
+            <TouchableOpacity 
+              style={styles.subscribeButton}
+              onPress={handleSubscribePress}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.subscribeButtonText}>Unlock Premium</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.logoutButton}
+              onPress={handleLogout}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.logoutButtonText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       )}
 
@@ -270,13 +274,13 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginTop: spacing.xl,
-    marginBottom: spacing.xl * 2,
+    marginBottom: spacing.lg,
   },
   greeting: {
     fontSize: typography.fontSize['3xl'],
     fontFamily: typography.fontFamily.bold,
     color: colors.primary.white,
-    marginBottom: spacing.xl * 2,
+    marginBottom: spacing.lg,
   },
   categoriesContainer: {
     flexDirection: 'row',
@@ -287,7 +291,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 16,
     padding: spacing.lg,
-    minHeight: 180,
+    minHeight: 200,
     position: 'relative',
   },
   meanderingCard: {
@@ -297,8 +301,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#3D3471',
   },
   categoryIcon: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     position: 'absolute',
     top: spacing.lg,
     left: spacing.lg,
@@ -314,6 +318,13 @@ const styles = StyleSheet.create({
     color: colors.primary.white,
     textAlign: 'left',
     lineHeight: 26,
+  },
+  genderText: {
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.regular,
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'left',
+    marginTop: spacing.xs,
   },
   categoryAuthor: {
     fontSize: typography.fontSize.sm,
@@ -333,16 +344,20 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.medium,
     color: colors.primary.orchid,
   },
-  headerButtons: {
+  bottomButtons: {
     flexDirection: 'row',
     gap: spacing.md,
-    marginTop: spacing.lg,
+    marginTop: spacing.xl,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.md,
   },
   subscribeButton: {
+    flex: 1,
     backgroundColor: colors.primary.orchid,
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: 25,
+    alignItems: 'center',
   },
   subscribeButtonText: {
     fontSize: typography.fontSize.md,
@@ -350,32 +365,38 @@ const styles = StyleSheet.create({
     color: colors.primary.white,
   },
   logoutButton: {
+    flex: 1,
     backgroundColor: colors.primary.eclipse,
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: 25,
     borderWidth: 1,
     borderColor: colors.secondary.lavender,
+    alignItems: 'center',
   },
   logoutButtonText: {
     fontSize: typography.fontSize.md,
     fontFamily: typography.fontFamily.bold,
     color: colors.secondary.lavender,
   },
+  dropdownContainer: {
+    position: 'relative',
+  },
   genderDropdown: {
     position: 'absolute',
-    top: 150,
-    right: spacing.lg,
+    top: '100%',
+    right: 0,
     backgroundColor: colors.primary.eclipse,
     borderRadius: 12,
     paddingVertical: spacing.sm,
-    minWidth: 150,
+    minWidth: 120,
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     zIndex: 1000,
+    marginTop: spacing.xs,
   },
   genderOption: {
     paddingVertical: spacing.md,
@@ -397,7 +418,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
   dailyLabel: {
     fontSize: typography.fontSize.md,
@@ -417,9 +438,5 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.regular,
     color: colors.primary.white,
     marginRight: spacing.xs,
-  },
-  dropdownArrow: {
-    fontSize: typography.fontSize.sm,
-    color: colors.primary.white,
   },
 });
