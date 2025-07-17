@@ -20,9 +20,10 @@ export const SplashScreen = () => {
       end={{ x: 0.5, y: 1.1066 }}
       style={styles.gradient}
     >
-      {/* Clouds (furthest back) */}
+      {/* Union/Clouds (furthest back) */}
       <Image source={require('../assets/splash/clouds.png')} style={styles.clouds} />
-      {/* Hills, layered for depth */}
+      
+      {/* Hills, layered for depth - matching Figma order */}
       <Image source={require('../assets/splash/hill_3.png')} style={styles.hill3} />
       <Image source={require('../assets/splash/hill_2.png')} style={styles.hill2} />
       <Image source={require('../assets/splash/hill_1.png')} style={styles.hill1} />
@@ -60,40 +61,41 @@ const styles = StyleSheet.create({
   },
   clouds: {
     position: 'absolute',
-    bottom: -40,
+    bottom: 0,
     width: width * 1.3,
-    left: '50%',
+    height: height * 0.3,
+    left: '55%',
     transform: [{ translateX: -width * 0.65 }],
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     zIndex: 0,
   },
   hill1: {
     position: 'absolute',
-    bottom: -60,
-    left: -width * 0.37,
-    width: width * 1.66,
-    height: width * 0.36,
+    bottom: -55,
+    left: -width * 0.2,
+    width: width * 1.3,
+    height: height * 0.25,
     resizeMode: 'contain',
-    zIndex: 1,
+    zIndex: 3,
   },
   hill2: {
     position: 'absolute',
-    bottom: -60,
-    left: -width * 0.32,
-    width: width * 1.66,
-    height: width * 0.36,
+    bottom: -90,
+    right: -width * .9,
+    width: width * 1.3,
+    height: height * 0.25,
     resizeMode: 'contain',
     zIndex: 2,
     transform: [{ scaleX: -1 }],
   },
   hill3: {
     position: 'absolute',
-    bottom: -80,
-    left: width * 0.1,
-    width: width * 1.66,
-    height: width * 0.36,
+    bottom: -45,
+    left: width * 0.2,
+    width: width * 1.2,
+    height: height * 0.22,
     resizeMode: 'contain',
-    zIndex: 3,
+    zIndex: 1,
   },
   centerContent: {
     position: 'absolute',
