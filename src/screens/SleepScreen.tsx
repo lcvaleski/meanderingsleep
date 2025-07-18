@@ -5,8 +5,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackParamList } from '../navigation/types';
 import { Logo } from '../design-system/components/Logo';
 import { colors, typography, spacing } from '../design-system/theme';
-import RevenueCatService from '../services/RevenueCatService';
-import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import crashlytics from '@react-native-firebase/crashlytics';
 import GoogleStorageService from '../services/GoogleStorageService';
 
@@ -15,7 +13,6 @@ type SleepScreenNavigationProp = StackNavigationProp<MainStackParamList, 'MainTa
 export function SleepScreen() {
   const navigation = useNavigation<SleepScreenNavigationProp>();
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('female');
-  const [showGenderSelector, setShowGenderSelector] = useState(false);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -60,26 +57,6 @@ export function SleepScreen() {
     // }
   };
 
-  const handleSubscribePress = async () => {
-    crashlytics().log('Subscribe button pressed');
-    try {
-      crashlytics().log('Calling presentPaywall');
-      const result = await RevenueCatService.presentPaywall();
-      crashlytics().log(`Paywall presentation result: ${result}`);
-      
-      if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
-        console.log('Purchase or restore successful');
-        crashlytics().log('Purchase or restore successful');
-      } else if (result === PAYWALL_RESULT.CANCELLED) {
-        console.log('User cancelled the paywall');
-        crashlytics().log('User cancelled the paywall');
-      }
-    } catch (error) {
-      console.error('Error presenting paywall:', error);
-      crashlytics().log(`Error in handleSubscribePress: ${error}`);
-      crashlytics().recordError(error instanceof Error ? error : new Error(String(error)));
-    }
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -100,43 +77,13 @@ export function SleepScreen() {
           {/* Your Daily Section */}
           <View style={styles.dailySection}>
             <Text style={styles.dailyLabel}>Your Daily</Text>
-            <View style={styles.dropdownContainer}>
-              <TouchableOpacity 
-                style={styles.readerDropdown} 
-                activeOpacity={0.7}
-                onPress={() => setShowGenderSelector(!showGenderSelector)}
-              >
-                <Text style={styles.readerText}>{selectedGender === 'female' ? 'Female' : 'Male'}</Text>
-              </TouchableOpacity>
-              
-              {/* Gender Selector Dropdown */}
-              {showGenderSelector && (
-                <View style={styles.genderDropdown}>
-              <TouchableOpacity
-                style={[
-                  styles.genderOption,
-                  selectedGender === 'female' && styles.genderOptionActive
-                ]}
-                onPress={() => {
-                  setSelectedGender('female');
-                  setShowGenderSelector(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={[
-                  styles.genderOptionText,
-                  selectedGender === 'female' && styles.genderOptionTextActive
-                ]}>Female</Text>
-              </TouchableOpacity>
+            <View style={styles.genderSelector}>
               <TouchableOpacity
                 style={[
                   styles.genderOption,
                   selectedGender === 'male' && styles.genderOptionActive
                 ]}
-                onPress={() => {
-                  setSelectedGender('male');
-                  setShowGenderSelector(false);
-                }}
+                onPress={() => setSelectedGender('male')}
                 activeOpacity={0.7}
               >
                 <Text style={[
@@ -144,8 +91,19 @@ export function SleepScreen() {
                   selectedGender === 'male' && styles.genderOptionTextActive
                 ]}>Male</Text>
               </TouchableOpacity>
-                </View>
-              )}
+              <TouchableOpacity
+                style={[
+                  styles.genderOption,
+                  selectedGender === 'female' && styles.genderOptionActive
+                ]}
+                onPress={() => setSelectedGender('female')}
+                activeOpacity={0.7}
+              >
+                <Text style={[
+                  styles.genderOptionText,
+                  selectedGender === 'female' && styles.genderOptionTextActive
+                ]}>Female</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -185,16 +143,6 @@ export function SleepScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Bottom Button */}
-          <View style={styles.bottomButtons}>
-            <TouchableOpacity 
-              style={styles.subscribeButton}
-              onPress={handleSubscribePress}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.subscribeButtonText}>Unlock Premium</Text>
-            </TouchableOpacity>
-          </View>
         </ScrollView>
 
     </SafeAreaView>
@@ -223,6 +171,7 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.bold,
     color: colors.primary.white,
     marginBottom: spacing.lg,
+    fontWeight: '600',
   },
   categoriesContainer: {
     flexDirection: 'row',
@@ -231,7 +180,7 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     flex: 1,
-    borderRadius: 16,
+    borderRadius: 8,
     padding: spacing.lg,
     minHeight: 200,
     position: 'relative',
@@ -273,60 +222,27 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.regular,
     color: colors.secondary.lavender,
   },
-  bottomButtons: {
+  genderSelector: {
     flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.xl,
-    marginBottom: spacing.md,
-    paddingHorizontal: spacing.md,
-  },
-  subscribeButton: {
-    flex: 1,
-    backgroundColor: colors.primary.orchid,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: 25,
-    alignItems: 'center',
-  },
-  subscribeButtonText: {
-    fontSize: typography.fontSize.md,
-    fontFamily: typography.fontFamily.bold,
-    color: colors.primary.white,
-  },
-  dropdownContainer: {
-    position: 'relative',
-  },
-  genderDropdown: {
-    position: 'absolute',
-    top: '100%',
-    right: 0,
-    backgroundColor: colors.primary.eclipse,
-    borderRadius: 12,
-    paddingVertical: spacing.sm,
-    minWidth: 120,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    zIndex: 1000,
-    marginTop: spacing.xs,
+    gap: spacing.xs,
   },
   genderOption: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   genderOptionActive: {
-    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    borderColor: colors.primary.orchid,
   },
   genderOptionText: {
-    fontSize: typography.fontSize.md,
+    fontSize: typography.fontSize.sm,
     fontFamily: typography.fontFamily.regular,
     color: colors.primary.white,
   },
   genderOptionTextActive: {
-    fontFamily: typography.fontFamily.bold,
-    color: colors.primary.orchid,
   },
   dailySection: {
     flexDirection: 'row',
@@ -338,19 +254,5 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.md,
     fontFamily: typography.fontFamily.medium,
     color: colors.primary.white,
-  },
-  readerDropdown: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: 8,
-  },
-  readerText: {
-    fontSize: typography.fontSize.sm,
-    fontFamily: typography.fontFamily.regular,
-    color: colors.primary.white,
-    marginRight: spacing.xs,
   },
 });
