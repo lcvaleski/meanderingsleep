@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import { MainTabParamList } from './types';
 import { SleepScreen } from '../screens/SleepScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
@@ -11,13 +11,21 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 // Custom tab bar icon components
 const SleepIcon = ({ focused }: { focused: boolean }) => (
   <View style={styles.iconContainer}>
-    <Text style={[styles.icon, focused && styles.iconFocused]}>🌙</Text>
+    <Image 
+      source={require('../assets/tabs/sleep_icon.png')}
+      style={[styles.iconImage, focused && styles.iconFocused]}
+      resizeMode="contain"
+    />
   </View>
 );
 
 const ProfileIcon = ({ focused }: { focused: boolean }) => (
   <View style={styles.iconContainer}>
-    <Text style={[styles.icon, focused && styles.iconFocused]}>👤</Text>
+    <Image 
+      source={require('../assets/tabs/profile_icon.png')}
+      style={[styles.iconImage, focused && styles.iconFocused]}
+      resizeMode="contain"
+    />
   </View>
 );
 
@@ -70,11 +78,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  icon: {
-    fontSize: 28,
-    color: 'rgba(255, 255, 255, 0.5)',
+  iconImage: {
+    width: 24,
+    height: 24,
+    opacity: 0.5,
   },
   iconFocused: {
-    color: colors.primary.white,
+    opacity: 1,
   },
 });
