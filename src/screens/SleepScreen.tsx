@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text, Image, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -7,6 +7,15 @@ import { Logo } from '../design-system/components/Logo';
 import { colors, typography, spacing } from '../design-system/theme';
 import crashlytics from '@react-native-firebase/crashlytics';
 import GoogleStorageService from '../services/GoogleStorageService';
+import { AudioSlider, AudioTrack } from '../components/AudioSlider';
+import audioLibraryData from '../data/audioLibrary.json';
+
+// Type the audio library data
+interface AudioLibrary {
+  audios: AudioTrack[];
+}
+
+const audioLibrary = audioLibraryData as AudioLibrary;
 
 type SleepScreenNavigationProp = StackNavigationProp<MainStackParamList, 'MainTabs'>;
 
@@ -20,6 +29,19 @@ export function SleepScreen() {
     if (hour < 17) return 'Good Afternoon';
     return 'Good Evening';
   };
+
+  // Filter audio tracks by gender and topic
+  const meanderingTracks = useMemo(() => {
+    return audioLibrary.audios.filter(
+      audio => audio.topic === 'meandering' && audio.gender === selectedGender
+    );
+  }, [selectedGender]);
+
+  const boringTracks = useMemo(() => {
+    return audioLibrary.audios.filter(
+      audio => audio.topic === 'boring' && audio.gender === selectedGender
+    );
+  }, [selectedGender]);
 
   const handleCategoryPress = async (category: string) => {
     console.log(`Pressed ${category}`);
@@ -44,6 +66,23 @@ export function SleepScreen() {
         trackTitle: `${currentDay} ${audioType === 'boring' ? 'Boring Lecture' : 'Meandering Story'}`,
         trackType: audioType,
         gender: selectedGender,
+      });
+    } else {
+      Alert.alert('Connection Error', 'Unable to connect to audio service. Please check your internet connection.');
+    }
+  };
+
+  const handleTrackPress = async (track: any) => {
+    const isConnected = await GoogleStorageService.testConnection();
+    
+    if (isConnected) {
+      const audioUrl = GoogleStorageService.getLibraryAudioUrl(track.id, track.topic, track.gender);
+      
+      navigation.navigate('Play', {
+        trackUrl: audioUrl,
+        trackTitle: track.subtopic,
+        trackType: track.topic,
+        gender: track.gender,
       });
     } else {
       Alert.alert('Connection Error', 'Unable to connect to audio service. Please check your internet connection.');
@@ -143,6 +182,23 @@ export function SleepScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Audio Sliders */}
+          <View style={styles.slidersContainer}>
+            <AudioSlider
+              title="Meandering Story Library"
+              tracks={meanderingTracks}
+              onTrackPress={handleTrackPress}
+              accentColor="#728AF6"
+            />
+            
+            <AudioSlider
+              title="Boring Lecture Library"
+              tracks={boringTracks}
+              onTrackPress={handleTrackPress}
+              accentColor="#CD52D4"
+            />
+          </View>
+
         </ScrollView>
 
     </SafeAreaView>
@@ -158,13 +214,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
   },
   header: {
     alignItems: 'center',
     marginTop: spacing.xl,
     marginBottom: spacing.lg,
+    paddingHorizontal: spacing.lg,
   },
   greeting: {
     fontSize: typography.fontSize['3xl'],
@@ -172,11 +228,15 @@ const styles = StyleSheet.create({
     color: colors.primary.white,
     marginBottom: spacing.lg,
     fontWeight: '600',
+    paddingHorizontal: spacing.lg,
   },
   categoriesContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.xl,
+    marginTop: spacing.sm
   },
   categoryCard: {
     flex: 1,
@@ -249,10 +309,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.lg,
+    paddingHorizontal: spacing.lg,
   },
   dailyLabel: {
     fontSize: typography.fontSize.md,
     fontFamily: typography.fontFamily.medium,
     color: colors.primary.white,
+  },
+  slidersContainer: {
+    marginTop: spacing.sm,
   },
 });

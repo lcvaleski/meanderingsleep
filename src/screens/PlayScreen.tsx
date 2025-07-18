@@ -88,7 +88,7 @@ export const PlayScreen = ({ route }: PlayScreenProps) => {
       {/* Track Info */}
       <View style={styles.trackInfo}>
         <Text style={styles.trackTitle}>
-          {trackType === 'meandering' ? 'Daily Meandering Story' : 'Daily Boring Lecture'}
+          {trackTitle}
         </Text>
         <Text style={styles.artistName}>{gender === 'female' ? 'Female' : 'Male'}</Text>
       </View>
