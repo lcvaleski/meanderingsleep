@@ -10,8 +10,13 @@ export type AuthStackParamList = {
   ForgotPassword: undefined;
 };
 
+export type MainTabParamList = {
+  Sleep: undefined;
+  Profile: undefined;
+};
+
 export type MainStackParamList = {
-  Main: undefined;
+  MainTabs: undefined;
   Play: {
     trackUrl: string;
     trackTitle: string;
