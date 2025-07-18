@@ -5,6 +5,7 @@ import initializeFirebase from './src/config/firebase';
 import crashlytics from '@react-native-firebase/crashlytics';
 import RevenueCatService from './src/services/RevenueCatService';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import TrackPlayer, { Capability } from 'react-native-track-player';
 
 // Initialize Firebase on app start
 initializeFirebase();
@@ -14,8 +15,33 @@ crashlytics().setCrashlyticsCollectionEnabled(true);
 
 function App(): React.JSX.Element {
   const [isRevenueCatReady, setIsRevenueCatReady] = useState(false);
+  const [isTrackPlayerReady, setIsTrackPlayerReady] = useState(false);
 
   useEffect(() => {
+    // Initialize TrackPlayer
+    const setupTrackPlayer = async () => {
+      try {
+        await TrackPlayer.setupPlayer();
+        await TrackPlayer.updateOptions({
+          capabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+            Capability.SeekTo,
+          ],
+          compactCapabilities: [Capability.Play, Capability.Pause],
+        });
+        setIsTrackPlayerReady(true);
+      } catch (error) {
+        console.error('Failed to setup TrackPlayer:', error);
+        crashlytics().recordError(error instanceof Error ? error : new Error(String(error)));
+        setIsTrackPlayerReady(true); // Allow app to continue
+      }
+    };
+
+    setupTrackPlayer();
+
     // Initialize RevenueCat
     crashlytics().log('App starting - initializing RevenueCat');
     RevenueCatService.initialize()
@@ -32,7 +58,7 @@ function App(): React.JSX.Element {
       });
   }, []);
 
-  if (!isRevenueCatReady) {
+  if (!isRevenueCatReady || !isTrackPlayerReady) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />

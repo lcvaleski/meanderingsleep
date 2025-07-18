@@ -12,4 +12,10 @@ export type AuthStackParamList = {
 
 export type MainStackParamList = {
   Main: undefined;
+  Play: {
+    trackUrl: string;
+    trackTitle: string;
+    trackType: 'meandering' | 'boring';
+    gender: 'male' | 'female';
+  };
 };

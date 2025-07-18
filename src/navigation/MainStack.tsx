@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text, Image, ScrollView, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackParamList } from './types';
 import { Logo } from '../design-system/components/Logo';
-import AudioPlayer from '../components/AudioPlayer';
 import { colors, typography, spacing } from '../design-system/theme';
 import RevenueCatService from '../services/RevenueCatService';
 import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import crashlytics from '@react-native-firebase/crashlytics';
 import GoogleStorageService from '../services/GoogleStorageService';
 import { useAuth } from '../contexts/AuthContext';
+import { PlayScreen } from '../screens/PlayScreen';
 
 const Stack = createStackNavigator<MainStackParamList>();
 
+type MainScreenNavigationProp = StackNavigationProp<MainStackParamList, 'Main'>;
+
 function MainScreen() {
+  const navigation = useNavigation<MainScreenNavigationProp>();
   const { signOut } = useAuth();
-  const [showPlayer, setShowPlayer] = useState(false);
-  const [selectedAudioUrl, setSelectedAudioUrl] = useState<string>('');
-  const [selectedAudioTitle, setSelectedAudioTitle] = useState<string>('');
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('female');
   const [showGenderSelector, setShowGenderSelector] = useState(false);
 
@@ -45,10 +47,13 @@ function MainScreen() {
       
       console.log('Audio URL:', audioUrl);
       
-      // Set the audio info and show player
-      setSelectedAudioUrl(audioUrl);
-      setSelectedAudioTitle(`${currentDay} ${audioType === 'boring' ? 'Boring Lecture' : 'Meandering Story'}`);
-      setShowPlayer(true);
+      // Navigate to play screen
+      navigation.navigate('Play', {
+        trackUrl: audioUrl,
+        trackTitle: `${currentDay} ${audioType === 'boring' ? 'Boring Lecture' : 'Meandering Story'}`,
+        trackType: audioType,
+        gender: selectedGender,
+      });
     } else {
       Alert.alert('Connection Error', 'Unable to connect to audio service. Please check your internet connection.');
     }
@@ -110,23 +115,11 @@ function MainScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primary.nocturne} />
-      {showPlayer ? (
-        <View style={styles.playerContainer}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => setShowPlayer(false)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.backButtonText}>← Back</Text>
-          </TouchableOpacity>
-          <AudioPlayer trackUrl={selectedAudioUrl} trackTitle={selectedAudioTitle} />
-        </View>
-      ) : (
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
           <View style={styles.header}>
             <Logo />
           </View>
@@ -241,7 +234,6 @@ function MainScreen() {
             </TouchableOpacity>
           </View>
         </ScrollView>
-      )}
 
     </SafeAreaView>
   );
@@ -255,6 +247,14 @@ export function MainStack() {
       }}
     >
       <Stack.Screen name="Main" component={MainScreen} />
+      <Stack.Screen 
+        name="Play" 
+        component={PlayScreen}
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -295,10 +295,10 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   meanderingCard: {
-    backgroundColor: '#3D3471',
+    backgroundColor: '#3d3471b7',
   },
   boringCard: {
-    backgroundColor: '#3D3471',
+    backgroundColor: '#3d3471b7',
   },
   categoryIcon: {
     width: 40,
@@ -330,19 +330,6 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.sm,
     fontFamily: typography.fontFamily.regular,
     color: colors.secondary.lavender,
-  },
-  playerContainer: {
-    flex: 1,
-  },
-  backButton: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    marginTop: spacing.md,
-  },
-  backButtonText: {
-    fontSize: typography.fontSize.lg,
-    fontFamily: typography.fontFamily.medium,
-    color: colors.primary.orchid,
   },
   bottomButtons: {
     flexDirection: 'row',

@@ -1618,6 +1618,11 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
+"@react-native-community/slider@^4.5.7":
+  version "4.5.7"
+  resolved "https://registry.npmjs.org/@react-native-community/slider/-/slider-4.5.7.tgz"
+  integrity sha512-WMDDZjNF2Bd8M8TrSqKf5xhM9ikdfCHtSPur64Ow3bB/OVrKufUQZ59NmYdNZNeGPvcHHTsafuYTY8zfZfbchQ==
+
 "@react-native-firebase/app@^18.8.0", "@react-native-firebase/app@18.9.0":
   version "18.9.0"
   resolved "https://registry.npmjs.org/@react-native-firebase/app/-/app-18.9.0.tgz"
