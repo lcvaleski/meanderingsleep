@@ -4,8 +4,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from '../../navigation/types';
-// import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
-// import auth from '@react-native-firebase/auth';
 import { Button } from '../../design-system/components/Button';
 import { EnhancedInput } from '../../components/EnhancedInput';
 import { Logo } from '../../design-system/components/Logo';
@@ -24,7 +22,7 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, signInWithApple } = useAuth();
 
   const isFormValid = !!email && !!password && validateEmail(email);
 
@@ -35,8 +33,8 @@ export const LoginScreen = () => {
       await signIn(email, password);
       // Navigation will be handled by auth state change
     } catch (err: any) {
-      setError(err.message || 'Failed to login');
-      Alert.alert('Login Error', err.message);
+      setError('Login error');
+      Alert.alert('Login Error', 'Login error');
     } finally {
       setLoading(false);
     }
@@ -49,16 +47,25 @@ export const LoginScreen = () => {
       await signInWithGoogle();
       // Navigation will be handled by auth state change
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
-      Alert.alert('Google Sign-In Error', err.message);
+      setError('Login error');
+      Alert.alert('Login Error', 'Login error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleAppleSignIn = async () => {
-    // Placeholder function
-    console.log('Signing in with Apple');
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithApple();
+      // Navigation will be handled by auth state change
+    } catch (err: any) {
+      setError('Login error');
+      Alert.alert('Login Error', 'Login error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

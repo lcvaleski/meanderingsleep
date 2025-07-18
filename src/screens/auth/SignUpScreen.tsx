@@ -5,7 +5,6 @@ import { Button } from '../../design-system/components/Button';
 import { EnhancedInput } from '../../components/EnhancedInput';
 import { Logo } from '../../design-system/components/Logo';
 import { colors, typography, spacing } from '../../design-system/theme';
-// import { AppleButton } from '@invertase/react-native-apple-authentication';
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -18,7 +17,7 @@ export const SignUpScreen = ({ navigation }: any) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, signInWithApple } = useAuth();
 
   const isFormValid =
     !!email &&
@@ -35,8 +34,8 @@ export const SignUpScreen = ({ navigation }: any) => {
       await signUp(email, password);
       // Navigation will be handled by auth state change
     } catch (err: any) {
-      setError(err.message || 'Failed to create account');
-      Alert.alert('Sign Up Error', err.message);
+      setError('Sign up error');
+      Alert.alert('Sign Up Error', 'Sign up error');
     } finally {
       setLoading(false);
     }
@@ -49,16 +48,25 @@ export const SignUpScreen = ({ navigation }: any) => {
       await signInWithGoogle();
       // Navigation will be handled by auth state change
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
-      Alert.alert('Google Sign-In Error', err.message);
+      setError('Sign up error');
+      Alert.alert('Sign Up Error', 'Sign up error');
     } finally {
       setLoading(false);
     }
   };
   
   const handleAppleSignIn = async () => {
-    // Placeholder function
-    console.log('Signing in with Apple');
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithApple();
+      // Navigation will be handled by auth state change
+    } catch (err: any) {
+      setError('Sign up error');
+      Alert.alert('Sign Up Error', 'Sign up error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

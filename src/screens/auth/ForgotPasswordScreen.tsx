@@ -25,7 +25,7 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
         [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
       );
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to send reset email');
+      Alert.alert('Error', 'Reset error');
     } finally {
       setLoading(false);
     }
