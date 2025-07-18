@@ -7,7 +7,7 @@ import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import crashlytics from '@react-native-firebase/crashlytics';
 
 export const ProfileScreen = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, deleteAccount } = useAuth();
 
   const handleSubscribePress = async () => {
     crashlytics().log('Subscribe button pressed');
@@ -55,6 +55,57 @@ export const ProfileScreen = () => {
     );
   };
 
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      'Delete Account',
+      'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete Account',
+          style: 'destructive',
+          onPress: () => {
+            // Second confirmation
+            Alert.alert(
+              'Final Confirmation',
+              'This will permanently delete your account and all associated data. Are you absolutely sure?',
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Yes, Delete My Account',
+                  style: 'destructive',
+                  onPress: async () => {
+                    try {
+                      await deleteAccount();
+                      // User will be automatically logged out
+                    } catch (error: any) {
+                      console.error('Error deleting account:', error);
+                      if (error.message && error.message.includes('sign in again')) {
+                        Alert.alert(
+                          'Re-authentication Required',
+                          'For security reasons, please logout and sign in again before deleting your account.',
+                          [{ text: 'OK' }]
+                        );
+                      } else {
+                        Alert.alert('Error', 'Failed to delete account. Please try again.');
+                      }
+                    }
+                  },
+                },
+              ],
+            );
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Profile</Text>
@@ -78,6 +129,14 @@ export const ProfileScreen = () => {
         activeOpacity={0.8}
       >
         <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.deleteButton}
+        onPress={handleDeleteAccount}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.deleteButtonText}>Delete Account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -135,10 +194,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.secondary.lavender,
     alignItems: 'center',
+    marginBottom: spacing.md,
   },
   logoutButtonText: {
     fontSize: typography.fontSize.md,
     fontFamily: typography.fontFamily.bold,
     color: colors.secondary.lavender,
+  },
+  deleteButton: {
+    backgroundColor: 'transparent',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#DC6F70',
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.bold,
+    color: '#DC6F70',
   },
 });

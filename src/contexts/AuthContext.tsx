@@ -13,6 +13,7 @@ interface AuthContextData {
   resetPassword: (email: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signInWithApple: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -136,6 +137,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const deleteAccount = async () => {
+    try {
+      const currentUser = auth().currentUser;
+      if (!currentUser) {
+        throw new Error('No user logged in');
+      }
+
+      // Delete the user account
+      await currentUser.delete();
+      
+      // Clean up RevenueCat
+      await RevenueCatService.logout();
+    } catch (error: any) {
+      // If the user needs to re-authenticate
+      if (error.code === 'auth/requires-recent-login') {
+        throw new Error('Please sign in again before deleting your account');
+      }
+      console.error('Delete account error:', error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -147,6 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resetPassword,
         signInWithGoogle,
         signInWithApple,
+        deleteAccount,
       }}
     >
       {children}
