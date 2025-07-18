@@ -271,6 +271,7 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         marginRight: spacing.md,
+        backgroundColor: 'transparent',
       },
       socialButtonText: {
         color: colors.primary.white,

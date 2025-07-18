@@ -147,7 +147,7 @@ export const LoginScreen = () => {
           <Image
             source={require('../../assets/google-icon.png')}
             style={styles.socialIcon}
-            resizeMode="center"
+            resizeMode="contain"
           />
           <Text style={styles.socialButtonText}>Sign in with Google</Text>
         </TouchableOpacity>
@@ -266,6 +266,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginRight: spacing.md,
+    backgroundColor: 'transparent',
   },
   socialButtonText: {
     color: colors.primary.white,
