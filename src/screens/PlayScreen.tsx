@@ -4,6 +4,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import { colors, typography, spacing } from '../design-system/theme';
 import TrackPlayer, { useProgress, State, usePlaybackState } from 'react-native-track-player';
 import Slider from '@react-native-community/slider';
+// @ts-expect-error – importing local image
+import defaultArtwork from '../assets/resources/night_scene_thumbnail.png';
 
 interface PlayScreenProps {
   route: {
@@ -37,7 +39,8 @@ export const PlayScreen = ({ route }: PlayScreenProps) => {
         id: '1',
         url: trackUrl,
         title: trackTitle,
-        artist: gender === 'female' ? 'Female' : 'Male',
+        artist: trackType === 'meandering' ? 'Meandering Stories' : 'Boring Lectures',
+        artwork: defaultArtwork,
       });
       await TrackPlayer.play();
     } catch (error) {
