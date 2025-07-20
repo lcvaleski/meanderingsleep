@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { colors, typography, spacing } from '../design-system/theme';
@@ -9,8 +9,46 @@ import crashlytics from '@react-native-firebase/crashlytics';
 export const ProfileScreen = () => {
   const { user, signOut, deleteAccount } = useAuth();
 
+  // Debug RevenueCat configuration
+  useEffect(() => {
+    const debugRevenueCat = async () => {
+      try {
+        console.log('=== RevenueCat Debug Info ===');
+        
+        // Check if RevenueCat is configured
+        const customerInfo = await RevenueCatService.getCustomerInfo();
+        console.log('Customer ID:', customerInfo.originalAppUserId);
+        console.log('Active Entitlements:', Object.keys(customerInfo.entitlements.active));
+        
+        // Try to fetch offerings
+        try {
+          const offerings = await RevenueCatService.getOfferings();
+          console.log('Available Offerings:', Object.keys(offerings.all));
+          console.log('Current Offering:', offerings.current?.identifier);
+          
+          if (offerings.current) {
+            console.log('Available Packages:');
+            offerings.current.availablePackages.forEach(pkg => {
+              console.log(`- ${pkg.identifier}: ${pkg.product.identifier} (${pkg.product.priceString})`);
+            });
+          }
+        } catch (offeringsError) {
+          console.error('Error fetching offerings:', offeringsError);
+        }
+        
+        console.log('=== End RevenueCat Debug ===');
+      } catch (error) {
+        console.error('RevenueCat debug error:', error);
+      }
+    };
+
+    debugRevenueCat();
+  }, []);
+
   const handleSubscribePress = async () => {
     crashlytics().log('Subscribe button pressed');
+    Alert.alert('Debug', 'Subscribe button pressed - attempting to show paywall');
+    
     try {
       crashlytics().log('Calling presentPaywall');
       const result = await RevenueCatService.presentPaywall();
@@ -19,6 +57,7 @@ export const ProfileScreen = () => {
       if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
         console.log('Purchase or restore successful');
         crashlytics().log('Purchase or restore successful');
+        Alert.alert('Success', 'Purchase or restore successful!');
       } else if (result === PAYWALL_RESULT.CANCELLED) {
         console.log('User cancelled the paywall');
         crashlytics().log('User cancelled the paywall');
@@ -27,6 +66,10 @@ export const ProfileScreen = () => {
       console.error('Error presenting paywall:', error);
       crashlytics().log(`Error in handleSubscribePress: ${error}`);
       crashlytics().recordError(error instanceof Error ? error : new Error(String(error)));
+      Alert.alert(
+        'Error', 
+        `Failed to present paywall: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   };
 
