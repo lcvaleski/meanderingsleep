@@ -1,5 +1,15 @@
 {
-  "identifier" : "CB8D5F7C",
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "8496DCBD",
   "nonRenewingSubscriptions" : [
 
   ],
@@ -7,9 +17,7 @@
 
   ],
   "settings" : {
-    "_applicationInternalID" : "6739661206",
-    "_developerTeamID" : "2K3L4598ND",
-    "_lastSynchronizedDate" : 724612800,
+    "_failTransactionsEnabled" : false,
     "_locale" : "en_US",
     "_storefront" : "USA",
     "_storeKitErrors" : [
@@ -62,11 +70,11 @@
   },
   "subscriptionGroups" : [
     {
-      "id" : "21620325",
+      "id" : "24A11697",
       "localizations" : [
 
       ],
-      "name" : "premium",
+      "name" : "All features",
       "subscriptions" : [
         {
           "adHocOffers" : [
@@ -75,48 +83,26 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "4.99",
+          "displayPrice" : "9.99",
           "familyShareable" : false,
           "groupNumber" : 1,
-          "internalID" : "6738252343",
+          "internalID" : "3D31C873",
           "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "Full Audio Library 1 Month",
-              "displayName" : "Premium Month",
+              "description" : "",
+              "displayName" : "",
               "locale" : "en_US"
             }
           ],
           "productID" : "premium_month",
           "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Full Audio Library 1 Month",
-          "subscriptionGroupID" : "21620325",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
+          "referenceName" : "Premium Month",
+          "subscriptionGroupID" : "24A11697",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
 
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "49.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "6738252344",
-          "introductoryOffer" : null,
-          "localizations" : [
-            {
-              "description" : "Full Audio Library 1 Year",
-              "displayName" : "Premium Year",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "premium_year",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Full Audio Library 1 Year",
-          "subscriptionGroupID" : "21620325",
-          "type" : "RecurringSubscription"
+          ]
         }
       ]
     }
