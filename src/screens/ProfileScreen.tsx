@@ -50,7 +50,7 @@ export const ProfileScreen = () => {
     crashlytics().log('Subscribe button pressed');
     
     // Debug alert before attempting paywall
-    Alert.alert('Debug', `About to show paywall\n\nPlatform: ${Platform.OS}\nBundle ID: net.coventry.sleepless\nAPI Key: ${Config.REVENUECAT_IOS_API_KEY ? 'Present' : 'Missing'}`);
+    Alert.alert('Debug', `About to show paywall\n\nPlatform: ${Platform.OS}\nBundle ID: net.coventry.sleepless\nAPI Key: ${Config.REVENUECAT_IOS_API_KEY || 'Not found'}`);
     
     try {
       crashlytics().log('Calling presentPaywall');
