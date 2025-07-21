@@ -21,8 +21,8 @@ workflows:
       vars:
         PACKAGE_NAME: "net.coventry.sleepless"  # Android application ID
         APP_VERSION: "0.2.3"  # Application version number (semver)
-        REVENUECAT_IOS_API_KEY: "$REVENUECAT_IOS_API_KEY"  # Set as secure variable in Codemagic UI
-        REVENUECAT_ANDROID_API_KEY: "$REVENUECAT_ANDROID_API_KEY"  # Set as secure variable in Codemagic UI
+        # RevenueCat API keys should be configured as secure variables in Codemagic UI
+        # They will be automatically available as environment variables during build
     
     scripts:
       # Step 1: Create .env file from environment variables
@@ -125,8 +125,8 @@ workflows:
         XCODE_SCHEME: "MeanderingSleepApp"  # Xcode build scheme name
         APP_STORE_APPLE_ID: 6502964632  # App's unique identifier in App Store Connect
         APP_VERSION: "0.2.3"  # Application version number (semver)
-        REVENUECAT_IOS_API_KEY: "$REVENUECAT_IOS_API_KEY"  # Set as secure variable in Codemagic UI
-        REVENUECAT_ANDROID_API_KEY: "$REVENUECAT_ANDROID_API_KEY"  # Set as secure variable in Codemagic UI
+        # RevenueCat API keys should be configured as secure variables in Codemagic UI
+        # They will be automatically available as environment variables during build
     
     scripts:
       # Step 1: Create .env file from environment variables
