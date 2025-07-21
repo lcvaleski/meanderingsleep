@@ -16,6 +16,7 @@ workflows:
       # Reference to a group of environment variables configured in Codemagic
       groups:
         - google_credentials  # Contains Google Play API access credentials
+        - production # Contains revenue cat keys
       
       # Custom environment variables for this workflow
       vars:
@@ -113,6 +114,7 @@ workflows:
       # Reference to a group of environment variables configured in Codemagic
       groups:
         - google_credentials  # Contains Google Play API access credentials
+        - production # Contains revenue cat keys
 
       # iOS code signing configuration for App Store distribution
       ios_signing:
