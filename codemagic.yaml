@@ -21,9 +21,17 @@ workflows:
       vars:
         PACKAGE_NAME: "net.coventry.sleepless"  # Android application ID
         APP_VERSION: "0.2.3"  # Application version number (semver)
+        REVENUECAT_IOS_API_KEY: "$REVENUECAT_IOS_API_KEY"  # Set as secure variable in Codemagic UI
+        REVENUECAT_ANDROID_API_KEY: "$REVENUECAT_ANDROID_API_KEY"  # Set as secure variable in Codemagic UI
     
     scripts:
-      # Step 1: Install all JavaScript dependencies from package.json
+      # Step 1: Create .env file from environment variables
+      - name: Create .env file
+        script: |
+          echo "REVENUECAT_IOS_API_KEY=$REVENUECAT_IOS_API_KEY" > .env
+          echo "REVENUECAT_ANDROID_API_KEY=$REVENUECAT_ANDROID_API_KEY" >> .env
+      
+      # Step 2: Install all JavaScript dependencies from package.json
       - name: Install npm dependencies
         script: | 
           npm install
@@ -117,9 +125,17 @@ workflows:
         XCODE_SCHEME: "MeanderingSleepApp"  # Xcode build scheme name
         APP_STORE_APPLE_ID: 6502964632  # App's unique identifier in App Store Connect
         APP_VERSION: "0.2.3"  # Application version number (semver)
+        REVENUECAT_IOS_API_KEY: "$REVENUECAT_IOS_API_KEY"  # Set as secure variable in Codemagic UI
+        REVENUECAT_ANDROID_API_KEY: "$REVENUECAT_ANDROID_API_KEY"  # Set as secure variable in Codemagic UI
     
     scripts:
-      # Step 1: Install all dependencies (JS and native iOS through CocoaPods)
+      # Step 1: Create .env file from environment variables
+      - name: Create .env file
+        script: |
+          echo "REVENUECAT_IOS_API_KEY=$REVENUECAT_IOS_API_KEY" > .env
+          echo "REVENUECAT_ANDROID_API_KEY=$REVENUECAT_ANDROID_API_KEY" >> .env
+      
+      # Step 2: Install all dependencies (JS and native iOS through CocoaPods)
       - name: Install JS & native dependencies
         script: |
           npm install
