@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize['3xl'],
     fontFamily: typography.fontFamily.bold,
     color: colors.primary.white,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
     fontWeight: '600',
     paddingHorizontal: spacing.lg,
   },
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
     paddingHorizontal: spacing.lg,
   },
   dailyLabel: {
