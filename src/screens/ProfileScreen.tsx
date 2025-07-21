@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { colors, typography, spacing } from '../design-system/theme';
 import RevenueCatService from '../services/RevenueCatService';
 import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import crashlytics from '@react-native-firebase/crashlytics';
+import Config from 'react-native-config';
 
 export const ProfileScreen = () => {
   const { user, signOut, deleteAccount } = useAuth();
@@ -68,7 +69,7 @@ export const ProfileScreen = () => {
       crashlytics().recordError(error instanceof Error ? error : new Error(String(error)));
       Alert.alert(
         'Error', 
-        `Failed to present paywall: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to present paywall: ${error instanceof Error ? error.message : String(error)}\n\nDebug Info:\n- Platform: ${Platform.OS}\n- Bundle ID: net.coventry.sleepless\n- API Key Prefix: ${Config.REVENUECAT_IOS_API_KEY ? Config.REVENUECAT_IOS_API_KEY.substring(0, 8) + '...' : 'Not found'}`
       );
     }
   };
