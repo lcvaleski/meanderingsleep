@@ -9,6 +9,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import GoogleStorageService from '../services/GoogleStorageService';
 import { AudioSlider, AudioTrack } from '../components/AudioSlider';
 import audioLibraryData from '../data/audioLibrary.json';
+import UpgradeCard from '../components/UpgradeCard';
 
 // Type the audio library data
 interface AudioLibrary {
@@ -182,6 +183,16 @@ export function SleepScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Upgrade Card */}
+          <View style={styles.upgradeCardContainer}>
+            <UpgradeCard 
+              onPress={() => {
+                console.log('Upgrade card pressed');
+                // TODO: Implement upgrade flow
+              }}
+            />
+          </View>
+
           {/* Audio Sliders */}
           <View style={styles.slidersContainer}>
             <AudioSlider
@@ -318,5 +329,9 @@ const styles = StyleSheet.create({
   },
   slidersContainer: {
     marginTop: spacing.sm,
+  },
+  upgradeCardContainer: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.xl,
   },
 });
