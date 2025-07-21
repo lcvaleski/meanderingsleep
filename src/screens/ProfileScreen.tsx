@@ -48,11 +48,15 @@ export const ProfileScreen = () => {
 
   const handleSubscribePress = async () => {
     crashlytics().log('Subscribe button pressed');
-    Alert.alert('Debug', 'Subscribe button pressed - attempting to show paywall');
+    
+    // Debug alert before attempting paywall
+    Alert.alert('Debug', `About to show paywall\n\nPlatform: ${Platform.OS}\nBundle ID: net.coventry.sleepless\nAPI Key: ${Config.REVENUECAT_IOS_API_KEY ? 'Present' : 'Missing'}`);
     
     try {
       crashlytics().log('Calling presentPaywall');
+      console.log('[ProfileScreen] About to call presentPaywall');
       const result = await RevenueCatService.presentPaywall();
+      console.log('[ProfileScreen] Paywall result:', result);
       crashlytics().log(`Paywall presentation result: ${result}`);
       
       if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
