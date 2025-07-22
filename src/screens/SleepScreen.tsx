@@ -239,17 +239,63 @@ export function SleepScreen() {
           {/* Audio Sliders */}
           <View style={styles.slidersContainer}>
             <AudioSlider
-              title="Meandering Story Library"
+              title="Meandering Stories"
               tracks={meanderingTracks}
               onTrackPress={handleTrackPress}
               accentColor="#728AF6"
+              onViewAllPress={async () => {
+                if (!isSubscribed) {
+                  try {
+                    await RevenueCatService.presentPaywall();
+                    // Re-check subscription status after paywall is dismissed
+                    await checkSubscriptionStatus();
+                    // If still not subscribed, return early
+                    const subscribed = await RevenueCatService.checkSubscriptionStatus();
+                    if (!subscribed) {
+                      return;
+                    }
+                  } catch (error) {
+                    console.error('Error presenting paywall:', error);
+                    return;
+                  }
+                }
+                navigation.navigate('ViewAll', {
+                  title: 'Meandering Stories',
+                  tracks: meanderingTracks,
+                  onTrackPress: handleTrackPress,
+                  accentColor: '#728AF6',
+                });
+              }}
             />
             
             <AudioSlider
-              title="Boring Lecture Library"
+              title="Boring Lectures"
               tracks={boringTracks}
               onTrackPress={handleTrackPress}
               accentColor="#CD52D4"
+              onViewAllPress={async () => {
+                if (!isSubscribed) {
+                  try {
+                    await RevenueCatService.presentPaywall();
+                    // Re-check subscription status after paywall is dismissed
+                    await checkSubscriptionStatus();
+                    // If still not subscribed, return early
+                    const subscribed = await RevenueCatService.checkSubscriptionStatus();
+                    if (!subscribed) {
+                      return;
+                    }
+                  } catch (error) {
+                    console.error('Error presenting paywall:', error);
+                    return;
+                  }
+                }
+                navigation.navigate('ViewAll', {
+                  title: 'Boring Lectures',
+                  tracks: boringTracks,
+                  onTrackPress: handleTrackPress,
+                  accentColor: '#CD52D4',
+                });
+              }}
             />
           </View>
 

@@ -15,6 +15,8 @@ export type MainTabParamList = {
   Profile: undefined;
 };
 
+import { AudioTrack } from '../components/AudioSlider';
+
 export type MainStackParamList = {
   MainTabs: undefined;
   Play: {
@@ -23,5 +25,11 @@ export type MainStackParamList = {
     trackType: 'meandering' | 'boring';
     gender: 'male' | 'female';
     isSubscribed?: boolean;
+  };
+  ViewAll: {
+    title: string;
+    tracks: AudioTrack[];
+    onTrackPress: (track: AudioTrack) => void;
+    accentColor: string;
   };
 };

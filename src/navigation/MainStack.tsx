@@ -2,6 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MainStackParamList } from './types';
 import { PlayScreen } from '../screens/PlayScreen';
+import { ViewAllScreen } from '../screens/ViewAllScreen';
 import { MainTabs } from './MainTabs';
 
 const Stack = createStackNavigator<MainStackParamList>();
@@ -18,6 +19,17 @@ export function MainStack() {
       <Stack.Screen 
         name="Play" 
         component={PlayScreen}
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+          gestureEnabled: true,
+          gestureDirection: 'vertical',
+          gestureResponseDistance: 800, // Allow swipe from anywhere on screen
+        }}
+      />
+      <Stack.Screen 
+        name="ViewAll" 
+        component={ViewAllScreen}
         options={{
           presentation: 'modal',
           headerShown: false,

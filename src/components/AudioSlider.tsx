@@ -21,16 +21,23 @@ interface AudioSliderProps {
   tracks: AudioTrack[];
   onTrackPress: (track: AudioTrack) => void;
   accentColor: string;
+  onViewAllPress?: () => void;
 }
 
 const CARD_WIDTH = 219;
 const CARD_GAP = 20;
 
-export function AudioSlider({ title, tracks, onTrackPress, accentColor }: AudioSliderProps) {
+export function AudioSlider({ title, tracks, onTrackPress, accentColor, onViewAllPress }: AudioSliderProps) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
+        {onViewAllPress && (
+          <TouchableOpacity onPress={onViewAllPress} activeOpacity={0.7} style={styles.viewAllButton}>
+            <Text style={styles.viewAllText}>View All</Text>
+            <Text style={styles.viewAllCaret}>›</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <ScrollView
         horizontal
@@ -115,5 +122,22 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.medium,
     color: colors.primary.white,
     letterSpacing: 0.42,
+  },
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  viewAllText: {
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.medium,
+    color: colors.primary.white,
+    letterSpacing: 0.42,
+  },
+  viewAllCaret: {
+    fontSize: typography.fontSize.lg,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.primary.white,
+    marginTop: -2,
   },
 });
