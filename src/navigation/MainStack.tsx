@@ -21,6 +21,9 @@ export function MainStack() {
         options={{
           presentation: 'modal',
           headerShown: false,
+          gestureEnabled: true,
+          gestureDirection: 'vertical',
+          gestureResponseDistance: 800, // Allow swipe from anywhere on screen
         }}
       />
     </Stack.Navigator>
