@@ -14,15 +14,17 @@ interface PlayScreenProps {
       trackTitle: string;
       trackType: 'meandering' | 'boring';
       gender: 'male' | 'female';
+      isSubscribed?: boolean;
     };
   };
 }
 
 export const PlayScreen = ({ route }: PlayScreenProps) => {
-  const { trackUrl, trackTitle, trackType, gender } = route.params;
+  const { trackUrl, trackTitle, trackType, gender, isSubscribed = true } = route.params;
   const progress = useProgress();
   const playbackState = usePlaybackState();
   const isPlaying = playbackState.state === State.Playing;
+  const FREE_PREVIEW_SECONDS = 600; // 10 minutes in seconds
 
   useEffect(() => {
     setupPlayer();
@@ -30,6 +32,14 @@ export const PlayScreen = ({ route }: PlayScreenProps) => {
       TrackPlayer.reset();
     };
   }, []);
+
+  // Check if free preview time limit is reached
+  useEffect(() => {
+    if (!isSubscribed && progress.position >= FREE_PREVIEW_SECONDS) {
+      TrackPlayer.pause();
+      TrackPlayer.seekTo(FREE_PREVIEW_SECONDS - 1); // Keep at the limit
+    }
+  }, [progress.position, isSubscribed]);
 
   const setupPlayer = async () => {
     try {
@@ -65,7 +75,9 @@ export const PlayScreen = ({ route }: PlayScreenProps) => {
   };
 
   const onSliderValueChange = async (value: number) => {
-    await TrackPlayer.seekTo(value);
+    // Limit seeking to 10 minutes for non-subscribers
+    const maxSeekPosition = isSubscribed ? value : Math.min(value, FREE_PREVIEW_SECONDS);
+    await TrackPlayer.seekTo(maxSeekPosition);
   };
 
   return (
@@ -94,6 +106,9 @@ export const PlayScreen = ({ route }: PlayScreenProps) => {
           {trackTitle}
         </Text>
         <Text style={styles.artistName}>{gender === 'female' ? 'Female' : 'Male'}</Text>
+        {!isSubscribed && (
+          <Text style={styles.previewText}>10 minute preview</Text>
+        )}
       </View>
 
       {/* Progress Bar */}
@@ -185,6 +200,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'left',
+  },
+  previewText: {
+    fontSize: typography.fontSize.sm,
+    fontFamily: typography.fontFamily.medium,
+    fontWeight: '500',
+    color: colors.secondary.coral,
+    textAlign: 'left',
+    marginTop: spacing.xs,
   },
   progressContainer: {
     marginBottom: spacing.xl,

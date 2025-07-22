@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text, Image, ScrollView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackParamList } from '../navigation/types';
 import { Logo } from '../design-system/components/Logo';
@@ -10,6 +10,7 @@ import GoogleStorageService from '../services/GoogleStorageService';
 import { AudioSlider, AudioTrack } from '../components/AudioSlider';
 import audioLibraryData from '../data/audioLibrary.json';
 import UpgradeCard from '../components/UpgradeCard';
+import RevenueCatService from '../services/RevenueCatService';
 
 // Type the audio library data
 interface AudioLibrary {
@@ -23,6 +24,29 @@ type SleepScreenNavigationProp = StackNavigationProp<MainStackParamList, 'MainTa
 export function SleepScreen() {
   const navigation = useNavigation<SleepScreenNavigationProp>();
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('female');
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+
+  // Check subscription status on mount and when screen is focused
+  const checkSubscriptionStatus = async () => {
+    try {
+      const subscribed = await RevenueCatService.checkSubscriptionStatus();
+      setIsSubscribed(subscribed);
+    } catch (error) {
+      console.error('Error checking subscription status:', error);
+    }
+  };
+
+  // Check subscription on mount
+  useEffect(() => {
+    checkSubscriptionStatus();
+  }, []);
+
+  // Check subscription when screen is focused (e.g., after returning from paywall)
+  useFocusEffect(
+    React.useCallback(() => {
+      checkSubscriptionStatus();
+    }, [])
+  );
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -61,12 +85,13 @@ export function SleepScreen() {
       
       console.log('Audio URL:', audioUrl);
       
-      // Navigate to play screen
+      // Navigate to play screen with subscription status
       navigation.navigate('Play', {
         trackUrl: audioUrl,
         trackTitle: `${currentDay} ${audioType === 'boring' ? 'Boring Lecture' : 'Meandering Story'}`,
         trackType: audioType,
         gender: selectedGender,
+        isSubscribed: isSubscribed,
       });
     } else {
       Alert.alert('Connection Error', 'Unable to connect to audio service. Please check your internet connection.');
@@ -74,6 +99,24 @@ export function SleepScreen() {
   };
 
   const handleTrackPress = async (track: any) => {
+    // Check subscription status first for library items
+    if (!isSubscribed) {
+      try {
+        await RevenueCatService.presentPaywall();
+        // Re-check subscription status after paywall is dismissed
+        await checkSubscriptionStatus();
+        // If still not subscribed, return early
+        const subscribed = await RevenueCatService.checkSubscriptionStatus();
+        if (!subscribed) {
+          return;
+        }
+      } catch (error) {
+        console.error('Error presenting paywall:', error);
+        return;
+      }
+    }
+
+    // User is subscribed, proceed with playing the audio
     const isConnected = await GoogleStorageService.testConnection();
     
     if (isConnected) {
@@ -88,13 +131,6 @@ export function SleepScreen() {
     } else {
       Alert.alert('Connection Error', 'Unable to connect to audio service. Please check your internet connection.');
     }
-    
-    // PAYWALL CODE COMMENTED OUT FOR TESTING
-    // try {
-    //   crashlytics().log('Calling presentPaywallIfNeeded with entitlement: premium');
-    //   const result = await RevenueCatService.presentPaywallIfNeeded('premium');
-    //   ...
-    // }
   };
 
 
@@ -183,15 +219,22 @@ export function SleepScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Upgrade Card */}
-          <View style={styles.upgradeCardContainer}>
-            <UpgradeCard 
-              onPress={() => {
-                console.log('Upgrade card pressed');
-                // TODO: Implement upgrade flow
-              }}
-            />
-          </View>
+          {/* Upgrade Card - Only show if not subscribed */}
+          {!isSubscribed && (
+            <View style={styles.upgradeCardContainer}>
+              <UpgradeCard 
+                onPress={async () => {
+                  try {
+                    await RevenueCatService.presentPaywall();
+                    // Re-check subscription status after paywall is dismissed
+                    checkSubscriptionStatus();
+                  } catch (error) {
+                    console.error('Error presenting paywall:', error);
+                  }
+                }}
+              />
+            </View>
+          )}
 
           {/* Audio Sliders */}
           <View style={styles.slidersContainer}>

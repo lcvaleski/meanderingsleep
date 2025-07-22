@@ -22,5 +22,6 @@ export type MainStackParamList = {
     trackTitle: string;
     trackType: 'meandering' | 'boring';
     gender: 'male' | 'female';
+    isSubscribed?: boolean;
   };
 };
