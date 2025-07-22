@@ -3,9 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react
 import { useAuth } from '../contexts/AuthContext';
 import { colors, typography, spacing } from '../design-system/theme';
 import RevenueCatService from '../services/RevenueCatService';
-import { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import crashlytics from '@react-native-firebase/crashlytics';
-import Config from 'react-native-config';
 
 export const ProfileScreen = () => {
   const { user, signOut, deleteAccount } = useAuth();
@@ -45,38 +43,6 @@ export const ProfileScreen = () => {
 
     debugRevenueCat();
   }, []);
-
-  const handleSubscribePress = async () => {
-    crashlytics().log('Subscribe button pressed');
-    
-    // Debug alert before attempting paywall
-    Alert.alert('Debug', `About to show paywall\n\nPlatform: ${Platform.OS}\nBundle ID: net.coventry.sleepless\nAPI Key: ${Config.REVENUECAT_IOS_API_KEY || 'Not found'}`);
-    
-    try {
-      crashlytics().log('Calling presentPaywall');
-      console.log('[ProfileScreen] About to call presentPaywall');
-      const result = await RevenueCatService.presentPaywall();
-      console.log('[ProfileScreen] Paywall result:', result);
-      crashlytics().log(`Paywall presentation result: ${result}`);
-      
-      if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
-        console.log('Purchase or restore successful');
-        crashlytics().log('Purchase or restore successful');
-        Alert.alert('Success', 'Purchase or restore successful!');
-      } else if (result === PAYWALL_RESULT.CANCELLED) {
-        console.log('User cancelled the paywall');
-        crashlytics().log('User cancelled the paywall');
-      }
-    } catch (error) {
-      console.error('Error presenting paywall:', error);
-      crashlytics().log(`Error in handleSubscribePress: ${error}`);
-      crashlytics().recordError(error instanceof Error ? error : new Error(String(error)));
-      Alert.alert(
-        'Error', 
-        `Failed to present paywall: ${error instanceof Error ? error.message : String(error)}\n\nDebug Info:\n- Platform: ${Platform.OS}\n- Bundle ID: net.coventry.sleepless\n- API Key Prefix: ${Config.REVENUECAT_IOS_API_KEY ? Config.REVENUECAT_IOS_API_KEY.substring(0, 8) + '...' : 'Not found'}`
-      );
-    }
-  };
 
   const handleLogout = async () => {
     Alert.alert(
@@ -164,14 +130,6 @@ export const ProfileScreen = () => {
       </View>
 
       <TouchableOpacity 
-        style={styles.subscribeButton}
-        onPress={handleSubscribePress}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.subscribeButtonText}>Unlock Premium</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity 
         style={styles.logoutButton}
         onPress={handleLogout}
         activeOpacity={0.8}
@@ -219,19 +177,6 @@ const styles = StyleSheet.create({
   value: {
     fontSize: typography.fontSize.md,
     fontFamily: typography.fontFamily.regular,
-    color: colors.primary.white,
-  },
-  subscribeButton: {
-    backgroundColor: colors.primary.orchid,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  subscribeButtonText: {
-    fontSize: typography.fontSize.md,
-    fontFamily: typography.fontFamily.bold,
     color: colors.primary.white,
   },
   logoutButton: {
