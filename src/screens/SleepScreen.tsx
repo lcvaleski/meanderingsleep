@@ -11,6 +11,7 @@ import { AudioSlider, AudioTrack } from '../components/AudioSlider';
 import audioLibraryData from '../data/audioLibrary.json';
 import UpgradeCard from '../components/UpgradeCard';
 import RevenueCatService from '../services/RevenueCatService';
+import { AnalyticsService } from '../services';
 
 // Type the audio library data
 interface AudioLibrary {
@@ -45,6 +46,7 @@ export function SleepScreen() {
   useFocusEffect(
     React.useCallback(() => {
       checkSubscriptionStatus();
+      AnalyticsService.logScreenView('SleepScreen');
     }, [])
   );
 
@@ -72,6 +74,9 @@ export function SleepScreen() {
     console.log(`Pressed ${category}`);
     crashlytics().log(`Category pressed: ${category}`);
     
+    // Log category selection
+    AnalyticsService.logCategorySelected(category, selectedGender);
+    
     // TEMPORARILY DISABLED PAYWALL FOR TESTING
     // Test Google Storage connection first
     const isConnected = await GoogleStorageService.testConnection();
@@ -84,6 +89,14 @@ export function SleepScreen() {
       const audioUrl = GoogleStorageService.getDailyAudioUrl(currentDay, audioType, selectedGender);
       
       console.log('Audio URL:', audioUrl);
+      
+      // Log daily content opened
+      AnalyticsService.logDailyContentOpened({
+        itemId: `${currentDay}-${audioType}-${selectedGender}`,
+        itemTitle: `${currentDay} ${audioType === 'boring' ? 'Boring Lecture' : 'Meandering Story'}`,
+        audioType: audioType,
+        dayNumber: currentDay,
+      });
       
       // Navigate to play screen with subscription status
       navigation.navigate('Play', {
@@ -102,12 +115,14 @@ export function SleepScreen() {
     // Check subscription status first for library items
     if (!isSubscribed) {
       try {
+        AnalyticsService.logPaywallShown('library_track', 'track_press');
         await RevenueCatService.presentPaywall();
         // Re-check subscription status after paywall is dismissed
         await checkSubscriptionStatus();
         // If still not subscribed, return early
         const subscribed = await RevenueCatService.checkSubscriptionStatus();
         if (!subscribed) {
+          AnalyticsService.logPaywallDismissed('library_track');
           return;
         }
       } catch (error) {
@@ -159,7 +174,14 @@ export function SleepScreen() {
                   styles.genderOption,
                   selectedGender === 'male' && styles.genderOptionActive
                 ]}
-                onPress={() => setSelectedGender('male')}
+                onPress={() => {
+                  const oldGender = selectedGender;
+                  setSelectedGender('male');
+                  if (oldGender !== 'male') {
+                    AnalyticsService.logGenderPreferenceChanged('male', oldGender);
+                    AnalyticsService.setGenderPreference('male');
+                  }
+                }}
                 activeOpacity={0.7}
               >
                 <Text style={[
@@ -172,7 +194,14 @@ export function SleepScreen() {
                   styles.genderOption,
                   selectedGender === 'female' && styles.genderOptionActive
                 ]}
-                onPress={() => setSelectedGender('female')}
+                onPress={() => {
+                  const oldGender = selectedGender;
+                  setSelectedGender('female');
+                  if (oldGender !== 'female') {
+                    AnalyticsService.logGenderPreferenceChanged('female', oldGender);
+                    AnalyticsService.setGenderPreference('female');
+                  }
+                }}
                 activeOpacity={0.7}
               >
                 <Text style={[
@@ -259,6 +288,7 @@ export function SleepScreen() {
                     return;
                   }
                 }
+                AnalyticsService.logViewAllOpened('meandering_stories');
                 navigation.navigate('ViewAll', {
                   title: 'Meandering Stories',
                   tracks: meanderingTracks,
@@ -289,6 +319,7 @@ export function SleepScreen() {
                     return;
                   }
                 }
+                AnalyticsService.logViewAllOpened('boring_lectures');
                 navigation.navigate('ViewAll', {
                   title: 'Boring Lectures',
                   tracks: boringTracks,

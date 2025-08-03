@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, typography, spacing } from '../design-system/theme';
 import TrackPlayer, { useProgress, State, usePlaybackState } from 'react-native-track-player';
 import Slider from '@react-native-community/slider';
+import { AnalyticsService } from '../services';
 // @ts-expect-error – importing local image
 import defaultArtwork from '../assets/resources/night_scene_thumbnail.png';
 
@@ -25,10 +26,22 @@ export const PlayScreen = ({ route }: PlayScreenProps) => {
   const playbackState = usePlaybackState();
   const isPlaying = playbackState.state === State.Playing;
   const FREE_PREVIEW_SECONDS = 600; // 10 minutes in seconds
+  const hasLoggedStart = useRef(false);
+  const hasLoggedPreviewLimit = useRef(false);
 
   useEffect(() => {
     setupPlayer();
+    AnalyticsService.logScreenView('PlayScreen');
     return () => {
+      // Log audio completion on unmount if audio was playing
+      if (progress.duration > 0) {
+        AnalyticsService.logAudioCompleted({
+          audioId: trackUrl,
+          audioTitle: trackTitle,
+          durationSeconds: progress.duration,
+          positionSeconds: progress.position,
+        });
+      }
       TrackPlayer.reset();
     };
   }, []);
@@ -38,6 +51,10 @@ export const PlayScreen = ({ route }: PlayScreenProps) => {
     if (!isSubscribed && progress.position >= FREE_PREVIEW_SECONDS) {
       TrackPlayer.pause();
       TrackPlayer.seekTo(FREE_PREVIEW_SECONDS - 1); // Keep at the limit
+      if (!hasLoggedPreviewLimit.current) {
+        AnalyticsService.logFreePreviewLimitReached(trackUrl, trackTitle);
+        hasLoggedPreviewLimit.current = true;
+      }
     }
   }, [progress.position, isSubscribed]);
 
@@ -53,6 +70,19 @@ export const PlayScreen = ({ route }: PlayScreenProps) => {
         artwork: defaultArtwork,
       });
       await TrackPlayer.play();
+      
+      // Log audio started event
+      if (!hasLoggedStart.current) {
+        AnalyticsService.logAudioStarted({
+          audioId: trackUrl,
+          audioTitle: trackTitle,
+          audioType: trackType,
+          gender: gender,
+          isSubscribed: isSubscribed,
+          sourceScreen: 'PlayScreen',
+        });
+        hasLoggedStart.current = true;
+      }
     } catch (error) {
       console.error('Error setting up player:', error);
       // If player is not initialized, we should handle this at app level
@@ -63,8 +93,10 @@ export const PlayScreen = ({ route }: PlayScreenProps) => {
   const togglePlayPause = async () => {
     if (playbackState.state === State.Playing) {
       await TrackPlayer.pause();
+      AnalyticsService.logAudioPaused(trackUrl, progress.position);
     } else {
       await TrackPlayer.play();
+      AnalyticsService.logAudioResumed(trackUrl, progress.position);
     }
   };
 

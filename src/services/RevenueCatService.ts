@@ -7,6 +7,7 @@ import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import { Platform } from 'react-native';
 import Config from 'react-native-config';
 import crashlytics from '@react-native-firebase/crashlytics';
+import AnalyticsService from './analytics';
 
 class RevenueCatService {
   private initialized = false;
@@ -94,6 +95,16 @@ class RevenueCatService {
     try {
       const { customerInfo } = await Purchases.purchasePackage(purchasePackage);
       console.log('Purchase successful');
+      
+      // Log subscription purchase
+      await AnalyticsService.logSubscriptionPurchased(
+        purchasePackage.identifier,
+        purchasePackage.product.price
+      );
+      
+      // Update subscription status
+      await AnalyticsService.setSubscriptionStatus(true);
+      
       return customerInfo;
     } catch (error) {
       const purchaseError = error as { userCancelled?: boolean };
@@ -141,6 +152,13 @@ class RevenueCatService {
       const paywallResult = await RevenueCatUI.presentPaywall();
       console.log('Paywall result:', paywallResult);
       crashlytics().log(`Paywall presented with result: ${paywallResult}`);
+      
+      // Log subscription if purchased
+      if (paywallResult === PAYWALL_RESULT.PURCHASED || paywallResult === PAYWALL_RESULT.RESTORED) {
+        const customerInfo = await this.getCustomerInfo();
+        await AnalyticsService.setSubscriptionStatus(customerInfo.activeSubscriptions.length > 0);
+      }
+      
       return paywallResult;
     } catch (error) {
       console.error('Error presenting paywall:', error);

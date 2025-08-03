@@ -66,6 +66,55 @@ Located in `src/design-system/`:
 - react-native-track-player hooks for audio state
 - No global state management library
 
+### Analytics Architecture
+- **Service**: `src/services/analytics.ts` - Centralized analytics service using Firebase Analytics
+- **Implementation**: Uses @react-native-firebase/analytics package
+- **Error Handling**: All analytics calls are wrapped in try-catch to prevent crashes
+- **Functions**:
+  - `logEvent(eventName, params)` - Log custom events with parameters
+  - `logScreenView(screenName)` - Track screen views
+  - `setUserId(userId)` - Associate events with user ID
+  - `setUserProperty(name, value)` - Set user properties for segmentation
+
+### Analytics Events Tracked
+1. **App Lifecycle**:
+   - `app_opened` - When app is launched
+     - Parameters: timestamp, hour_of_day, day_of_week
+
+2. **Audio Playback**:
+   - `audio_started` - When user starts playing audio
+     - Parameters: audio_id, audio_title, audio_type, gender_preference, is_subscribed, source_screen, hour_of_day
+   - `audio_paused/resumed` - Track engagement patterns
+   - `audio_completed` - When audio finishes playing
+     - Parameters: audio_id, audio_title, duration_seconds, position_seconds, completion_percentage
+   - `free_preview_limit_reached` - When non-subscribers hit 10min limit
+
+3. **Screen Navigation**:
+   - `logScreenView` - Tracked for SleepScreen, PlayScreen, ProfileScreen
+
+4. **User Interactions**:
+   - `category_selected` - When user selects meandering/boring category
+   - `gender_preference_changed` - When switching between male/female voices
+   - `daily_content_opened` - When user opens daily audio
+   - `view_all_opened` - When user taps "View All" button
+
+5. **Authentication**:
+   - `login/sign_up` - Track auth methods (email, google, apple)
+   - `login_failed/sign_up_failed` - Track auth failures
+   - `logout` - When user signs out
+   - `password_reset_requested` - Password reset attempts
+   - `account_deleted` - Account deletion
+
+6. **Monetization**:
+   - `paywall_shown/dismissed` - Paywall interaction tracking
+   - `subscription_purchased` - Successful purchases
+   - `subscription_status_checked` - RevenueCat status checks
+
+7. **User Properties**:
+   - `gender_preference` - Male/female voice preference
+   - `subscription_status` - Subscribed/free status
+   - `most_used_audio_type` - Meandering/boring preference
+
 ## Development Workflow
 
 1. Work on `dev` branch for feature development

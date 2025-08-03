@@ -4,9 +4,18 @@ import { useAuth } from '../contexts/AuthContext';
 import { colors, typography, spacing } from '../design-system/theme';
 import RevenueCatService from '../services/RevenueCatService';
 import crashlytics from '@react-native-firebase/crashlytics';
+import { AnalyticsService } from '../services';
+import { useFocusEffect } from '@react-navigation/native';
 
 export const ProfileScreen = () => {
   const { user, signOut, deleteAccount } = useAuth();
+
+  // Track screen view
+  useFocusEffect(
+    React.useCallback(() => {
+      AnalyticsService.logScreenView('ProfileScreen');
+    }, [])
+  );
 
   // Debug RevenueCat configuration
   useEffect(() => {

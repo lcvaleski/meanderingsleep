@@ -6,6 +6,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import RevenueCatService from './src/services/RevenueCatService';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import TrackPlayer, { Capability } from 'react-native-track-player';
+import { AnalyticsService } from './src/services';
 
 // Initialize Firebase on app start
 initializeFirebase();
@@ -18,6 +19,9 @@ function App(): React.JSX.Element {
   const [isTrackPlayerReady, setIsTrackPlayerReady] = useState(false);
 
   useEffect(() => {
+    // Log app opened event
+    AnalyticsService.logAppOpened();
+
     // Initialize TrackPlayer
     const setupTrackPlayer = async () => {
       try {
