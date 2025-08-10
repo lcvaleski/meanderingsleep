@@ -52,8 +52,17 @@ export function SleepScreen() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
+    
+    // Late night / early morning (9pm - 5am)
+    if (hour >= 21 || hour < 5) return 'Time to Wind Down';
+    
+    // Morning (5am - 12pm)
+    if (hour >= 5 && hour < 12) return 'Good Morning';
+    
+    // Afternoon (12pm - 5pm)
+    if (hour >= 12 && hour < 17) return 'Good Afternoon';
+    
+    // Evening (5pm - 9pm)
     return 'Good Evening';
   };
 
