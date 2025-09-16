@@ -10,6 +10,26 @@ export type AuthStackParamList = {
   ForgotPassword: undefined;
 };
 
+export type MainTabParamList = {
+  Sleep: undefined;
+  Profile: undefined;
+};
+
+import { AudioTrack } from '../components/AudioSlider';
+
 export type MainStackParamList = {
-  Main: undefined;
+  MainTabs: undefined;
+  Play: {
+    trackUrl: string;
+    trackTitle: string;
+    trackType: 'meandering' | 'boring';
+    gender: 'male' | 'female';
+    isSubscribed?: boolean;
+  };
+  ViewAll: {
+    title: string;
+    tracks: AudioTrack[];
+    onTrackPress: (track: AudioTrack) => void;
+    accentColor: string;
+  };
 };

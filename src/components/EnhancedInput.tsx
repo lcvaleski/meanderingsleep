@@ -160,10 +160,10 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary.blueberry,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
     position: 'relative',
     minHeight: 56,
   },

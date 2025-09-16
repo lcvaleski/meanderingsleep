@@ -2,6 +2,9 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
+apply plugin: "com.google.firebase.crashlytics"
+
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -86,8 +89,8 @@ android {
         applicationId "net.coventry.sleepless"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode project.hasProperty('versionCode') ? project.versionCode.toInteger() : 1
+        versionName project.hasProperty('versionName') ? project.versionName : "1.0"
     }
     signingConfigs {
         debug {
@@ -96,17 +99,27 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (System.env.CM_KEYSTORE_PATH) {
+                storeFile file(System.env.CM_KEYSTORE_PATH)
+                storePassword System.env.CM_KEYSTORE_PASSWORD
+                keyAlias System.env.CM_KEY_ALIAS
+                keyPassword System.env.CM_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            // Enable native crash reporting
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
 }
@@ -115,6 +128,13 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.facebook.react:flipper-integration")
+    
+    // Add androidx.core dependency to fix OnUserLeaveHintProvider error
+    implementation("androidx.core:core:${rootProject.ext.androidXCoreVersion}")
+    
+    // Firebase Crashlytics
+    implementation platform('com.google.firebase:firebase-bom:32.7.1')
+    implementation 'com.google.firebase:firebase-crashlytics'
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

@@ -14,14 +14,16 @@ export const SplashScreen = () => {
   const navigation = useNavigation<SplashScreenNavigationProp>();
   return (
     <LinearGradient
-      colors={['#838ACA', '#2E2464']}
+      colors={['#2E2464', '#838ACA']}
+      locations={[0.0729, 0.9266]}
       start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
+      end={{ x: 0.5, y: 1.1066 }}
       style={styles.gradient}
     >
-      {/* Clouds (furthest back) */}
+      {/* Union/Clouds (furthest back) */}
       <Image source={require('../assets/splash/clouds.png')} style={styles.clouds} />
-      {/* Hills, layered for depth */}
+      
+      {/* Hills, layered for depth - matching Figma order */}
       <Image source={require('../assets/splash/hill_3.png')} style={styles.hill3} />
       <Image source={require('../assets/splash/hill_2.png')} style={styles.hill2} />
       <Image source={require('../assets/splash/hill_1.png')} style={styles.hill1} />
@@ -60,58 +62,67 @@ const styles = StyleSheet.create({
   clouds: {
     position: 'absolute',
     bottom: 0,
-    width: width,
+    width: width * 1.3,
+    height: height * 0.3,
+    left: '55%',
+    transform: [{ translateX: -width * 0.65 }],
     resizeMode: 'cover',
     zIndex: 0,
   },
   hill1: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    width: width,
-    resizeMode: 'cover',
-    zIndex: 1,
+    bottom: -55,
+    left: -width * 0.2,
+    width: width * 1.3,
+    height: height * 0.25,
+    resizeMode: 'contain',
+    zIndex: 3,
   },
   hill2: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    width: width,
-    resizeMode: 'cover',
+    bottom: -90,
+    right: -width * .9,
+    width: width * 1.3,
+    height: height * 0.25,
+    resizeMode: 'contain',
     zIndex: 2,
-
+    transform: [{ scaleX: -1 }],
   },
   hill3: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    width: width,
-    resizeMode: 'cover',
-    zIndex: 3,
-
+    bottom: -45,
+    left: width * 0.2,
+    width: width * 1.2,
+    height: height * 0.22,
+    resizeMode: 'contain',
+    zIndex: 1,
   },
   centerContent: {
     position: 'absolute',
-    top: height * 0.22,
-    width: '100%',
+    top: '50%',
+    left: 0,
+    right: 0,
+    transform: [{ translateY: -height * 0.2 }],
     alignItems: 'center',
     zIndex: 10,
   },
   logo: {
-    width: 75,
-    height: 75,
-    marginBottom: 24,
+    width: 63,
+    height: 65,
+    marginBottom: 30,
     resizeMode: 'contain',
   },
   logoText: {
-    width: 260,
-    height: 48,
+    width: 305,
+    height: 36,
     resizeMode: 'contain',
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: height * 0.4, // just above the clouds
-    width: '100%',
+    top: '50%',
+    left: 0,
+    right: 0,
+    transform: [{ translateY: height * 0.02 }],
     alignItems: 'center',
     zIndex: 20,
   },

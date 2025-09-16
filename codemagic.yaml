@@ -11,19 +11,28 @@ workflows:
     environment:
       # Android signing configuration for release builds
       android_signing:
-        - Keystore  # References the keystore configured in Codemagic
+        - Keystore
       
       # Reference to a group of environment variables configured in Codemagic
       groups:
         - google_credentials  # Contains Google Play API access credentials
+        - production # Contains revenue cat keys
       
       # Custom environment variables for this workflow
       vars:
         PACKAGE_NAME: "net.coventry.sleepless"  # Android application ID
-        APP_VERSION: "0.2.3"  # Application version number (semver)
+        APP_VERSION: "0.2.4"  # Application version number (semver)
+        # RevenueCat API keys should be configured as secure variables in Codemagic UI
+        # They will be automatically available as environment variables during build
     
     scripts:
-      # Step 1: Install all JavaScript dependencies from package.json
+      # Step 1: Create .env file from environment variables
+      - name: Create .env file
+        script: |
+          echo "REVENUECAT_IOS_API_KEY=$REVENUECAT_IOS_API_KEY" > .env
+          echo "REVENUECAT_ANDROID_API_KEY=$REVENUECAT_ANDROID_API_KEY" >> .env
+      
+      # Step 2: Install all JavaScript dependencies from package.json
       - name: Install npm dependencies
         script: | 
           npm install
@@ -45,7 +54,15 @@ workflows:
           # Decode the base64-encoded google-services.json and write it to the correct location
           echo $ANDROID_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/android/app/google-services.json"
       
-      # Step 5: Build the Android release bundle with auto-incremented version number
+      # Step 5: Create .env file with RevenueCat API keys
+      - name: Create .env file
+        script: |
+          echo "REVENUECAT_IOS_API_KEY=$REVENUECAT_IOS_API_KEY" > "$CM_BUILD_DIR/.env"
+          echo "REVENUECAT_ANDROID_API_KEY=$REVENUECAT_ANDROID_API_KEY" >> "$CM_BUILD_DIR/.env"
+          # Create symlink for iOS
+          cd "$CM_BUILD_DIR/ios" && ln -s ../.env .env
+      
+      # Step 6: Build the Android release bundle with auto-incremented version number
       - name: Build Android release
         script: | 
           # Fetch the latest build number from Google Play
@@ -68,10 +85,13 @@ workflows:
           ./gradlew bundleRelease \
               -PversionCode=$UPDATED_BUILD_NUMBER \
               -PversionName=$APP_VERSION
+      
     
     # Files to save after build completion
     artifacts:
       - android/app/build/outputs/**/*.aab  # Android App Bundle for release
+      - android/app/build/outputs/**/mapping.txt  # ProGuard/R8 mapping file
+      - android/app/build/intermediates/merged_native_libs/**/out/lib/**/*.so  # Native debug symbols
     
     # Publishing configuration for Google Play Store
     publishing:
@@ -79,7 +99,6 @@ workflows:
         credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS  # From google_credentials group
         track: internal  # Deploy to internal testing track
         submit_as_draft: true  # Upload as draft (requires manual review)
-        changes_not_sent_for_review: true  # Don't auto-submit for review
 
   # iOS Build & Deployment Workflow
   ios-workflow:
@@ -95,6 +114,7 @@ workflows:
       # Reference to a group of environment variables configured in Codemagic
       groups:
         - google_credentials  # Contains Google Play API access credentials
+        - production # Contains revenue cat keys
 
       # iOS code signing configuration for App Store distribution
       ios_signing:
@@ -106,10 +126,18 @@ workflows:
         XCODE_WORKSPACE: "MeanderingSleepApp.xcworkspace"  # Xcode workspace file name
         XCODE_SCHEME: "MeanderingSleepApp"  # Xcode build scheme name
         APP_STORE_APPLE_ID: 6502964632  # App's unique identifier in App Store Connect
-        APP_VERSION: "0.2.3"  # Application version number (semver)
+        APP_VERSION: "0.2.4"  # Application version number (semver)
+        # RevenueCat API keys should be configured as secure variables in Codemagic UI
+        # They will be automatically available as environment variables during build
     
     scripts:
-      # Step 1: Install all dependencies (JS and native iOS through CocoaPods)
+      # Step 1: Create .env file from environment variables
+      - name: Create .env file
+        script: |
+          echo "REVENUECAT_IOS_API_KEY=$REVENUECAT_IOS_API_KEY" > .env
+          echo "REVENUECAT_ANDROID_API_KEY=$REVENUECAT_ANDROID_API_KEY" >> .env
+      
+      # Step 2: Install all dependencies (JS and native iOS through CocoaPods)
       - name: Install JS & native dependencies
         script: |
           npm install
@@ -132,7 +160,15 @@ workflows:
           # Decode the base64-encoded GoogleService-Info.plist and write it to the correct location
           echo $IOS_FIREBASE_CONFIG | base64 --decode > "$CM_BUILD_DIR/ios/MeanderingSleepApp/GoogleService-Info.plist"
       
-      # Step 5: Set version and increment build number based on TestFlight
+      # Step 5: Create .env file with RevenueCat API keys
+      - name: Create .env file
+        script: |
+          echo "REVENUECAT_IOS_API_KEY=$REVENUECAT_IOS_API_KEY" > "$CM_BUILD_DIR/.env"
+          echo "REVENUECAT_ANDROID_API_KEY=$REVENUECAT_ANDROID_API_KEY" >> "$CM_BUILD_DIR/.env"
+          # Create symlink for iOS
+          cd "$CM_BUILD_DIR/ios" && ln -s ../.env .env
+      
+      # Step 6: Set version and increment build number based on TestFlight
       - name: Set version and build number
         script: | 
           #!/bin/sh
@@ -142,14 +178,18 @@ workflows:
           
           # Set build number (CFBundleVersion)
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
-          # Add a safety margin to ensure we're above any existing build number
-          # Also handles case where the API returns stale data
-          # Ensure minimum build number is 23 (higher than the rejected 22)
-          if [ -z "$LATEST_BUILD_NUMBER" ] || [ "$LATEST_BUILD_NUMBER" -lt 22 ]; then
-            LATEST_BUILD_NUMBER=22
+          echo "Latest build number from App Store Connect: $LATEST_BUILD_NUMBER"
+          
+          # Ensure we're always incrementing beyond any previous builds
+          # Start from a minimum of 100 to avoid conflicts
+          MIN_BUILD_NUMBER=100
+          if [ -z "$LATEST_BUILD_NUMBER" ] || [ "$LATEST_BUILD_NUMBER" -lt "$MIN_BUILD_NUMBER" ]; then
+            NEW_BUILD_NUMBER=$((MIN_BUILD_NUMBER + $BUILD_NUMBER))
+          else
+            NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 10))
           fi
-          NEW_BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 10))
-          echo "Latest build number from App Store: $LATEST_BUILD_NUMBER, setting to: $NEW_BUILD_NUMBER"
+          
+          echo "Setting new build number to: $NEW_BUILD_NUMBER"
           agvtool new-version -all $NEW_BUILD_NUMBER
       
       # Step 6: Build the iOS app and create an IPA package
@@ -158,6 +198,21 @@ workflows:
           xcode-project build-ipa \
             --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME"
+      
+      # Step 7: Upload dSYM files to Firebase Crashlytics
+      - name: Upload dSYM to Firebase Crashlytics
+        script: |
+          echo "Uploading dSYM files to Firebase Crashlytics..."
+          # Find the dSYM files
+          DSYM_PATH=$(find $HOME/Library/Developer/Xcode/DerivedData -name "*.app.dSYM" | head -1)
+          if [ -n "$DSYM_PATH" ]; then
+            # Upload using Firebase CLI
+            $CM_BUILD_DIR/ios/Pods/FirebaseCrashlytics/upload-symbols \
+              -gsp $CM_BUILD_DIR/ios/MeanderingSleepApp/GoogleService-Info.plist \
+              -p ios $DSYM_PATH || echo "Warning: Failed to upload dSYM to Crashlytics"
+          else
+            echo "Warning: No dSYM file found"
+          fi
     
     # Files to save after build completion
     artifacts:

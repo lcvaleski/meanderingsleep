@@ -84,8 +84,10 @@ export async function PlaybackService() {
     Event.PlaybackMetadataReceived,
     async ({ title, artist }) => {
       const activeTrack = await TrackPlayer.getActiveTrack();
+      // Don't update metadata from embedded file data - keep our custom metadata
+      // This prevents "Chapter 1" etc from appearing
       TrackPlayer.updateNowPlayingMetadata({
-        artist: [title, artist].filter(Boolean).join(' - '),
+        artist: activeTrack?.artist,
         title: activeTrack?.title,
         artwork: activeTrack?.artwork,
       });

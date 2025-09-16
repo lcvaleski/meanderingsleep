@@ -5,7 +5,6 @@ import { Button } from '../../design-system/components/Button';
 import { EnhancedInput } from '../../components/EnhancedInput';
 import { Logo } from '../../design-system/components/Logo';
 import { colors, typography, spacing } from '../../design-system/theme';
-// import { AppleButton } from '@invertase/react-native-apple-authentication';
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -18,7 +17,7 @@ export const SignUpScreen = ({ navigation }: any) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, signInWithApple } = useAuth();
 
   const isFormValid =
     !!email &&
@@ -35,8 +34,8 @@ export const SignUpScreen = ({ navigation }: any) => {
       await signUp(email, password);
       // Navigation will be handled by auth state change
     } catch (err: any) {
-      setError(err.message || 'Failed to create account');
-      Alert.alert('Sign Up Error', err.message);
+      setError('Sign up error');
+      Alert.alert('Sign Up Error', 'Sign up error');
     } finally {
       setLoading(false);
     }
@@ -49,16 +48,25 @@ export const SignUpScreen = ({ navigation }: any) => {
       await signInWithGoogle();
       // Navigation will be handled by auth state change
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
-      Alert.alert('Google Sign-In Error', err.message);
+      setError('Sign up error');
+      Alert.alert('Sign Up Error', 'Sign up error');
     } finally {
       setLoading(false);
     }
   };
   
   const handleAppleSignIn = async () => {
-    // Placeholder function
-    console.log('Signing in with Apple');
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithApple();
+      // Navigation will be handled by auth state change
+    } catch (err: any) {
+      setError('Sign up error');
+      Alert.alert('Sign Up Error', 'Sign up error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -78,7 +86,6 @@ export const SignUpScreen = ({ navigation }: any) => {
       <View style={styles.formFields}>
         <EnhancedInput
           label="Email"
-          placeholder="example@email.com"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -90,7 +97,6 @@ export const SignUpScreen = ({ navigation }: any) => {
         />
         <EnhancedInput
           label="Password"
-          placeholder="Enter your password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry={true}
@@ -100,7 +106,6 @@ export const SignUpScreen = ({ navigation }: any) => {
         />
         <EnhancedInput
           label="Confirm Password"
-          placeholder="Re-enter your password"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry={true}
@@ -175,13 +180,16 @@ const styles = StyleSheet.create({
       },
       container: {
         flexGrow: 1,
-        padding: spacing.lg,
+        paddingHorizontal: spacing.xl,
+        paddingVertical: spacing.xl * 2,
         justifyContent: 'center',
       },
       title: {
-        fontSize: typography.fontSize['2xl'],
+        fontSize: typography.fontSize['3xl'],
         fontFamily: typography.fontFamily.bold,
-        marginBottom: spacing.xl,
+        fontWeight: '700',
+        marginBottom: spacing.xl * 2,
+        marginTop: spacing.xl,
         textAlign: 'center',
         color: colors.primary.white,
       },
@@ -211,8 +219,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
       },
       loginTextBold: {
-        color: colors.primary.orchid,
+        color: colors.primary.white,
         fontWeight: 'bold',
+        textDecorationLine: 'underline',
       },
       errorText: {
         color: colors.secondary.coral,
@@ -228,16 +237,16 @@ const styles = StyleSheet.create({
       divider: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: spacing.lg,
+        marginVertical: spacing.xl,
       },
       dividerLine: {
         flex: 1,
         height: 1,
-        backgroundColor: colors.primary.blueberry,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
       },
       dividerText: {
-        marginHorizontal: spacing.sm,
-        color: colors.primary.white,
+        marginHorizontal: spacing.md,
+        color: 'rgba(255, 255, 255, 0.6)',
         fontFamily: typography.fontFamily.medium,
         fontSize: typography.fontSize.sm,
       },
@@ -250,18 +259,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.primary.blueberry,
-        borderRadius: 24,
-        paddingVertical: 12,
-        width: '90%',
+        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        borderRadius: 12,
+        paddingVertical: spacing.md,
+        width: '100%',
         marginBottom: spacing.md,
         borderWidth: 1,
-        borderColor: colors.primary.blueberry,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
       },
       socialIcon: {
         width: 20,
         height: 20,
         marginRight: spacing.md,
+        backgroundColor: 'transparent',
       },
       socialButtonText: {
         color: colors.primary.white,

@@ -35,6 +35,9 @@ target 'MeanderingSleepApp' do
     :fabric_enabled => false, # 👈 Add this line if it's not there
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+  
+  # Firebase Crashlytics
+  pod 'Firebase/Crashlytics'
 
 
   target 'MeanderingSleepAppTests' do

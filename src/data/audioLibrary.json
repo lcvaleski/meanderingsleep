@@ -1,0 +1,256 @@
+{
+    "audios": [
+        {
+            "topic": "boring",
+            "subtopic": "Introduction to Mosaics",
+            "id": "730F9FEA",
+            "gender": "female"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Introduction to Mosaics",
+            "id": "36295E1D",
+            "gender": "male"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Wandering the Library",
+            "id": "CF12E622",
+            "gender": "female"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Mundane Observations",
+            "id": "4A8F2C3D",
+            "gender": "male"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 1",
+            "id": "E4471AF4",
+            "gender": "female"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 1",
+            "id": "C967F49D",
+            "gender": "male"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "The Discovery of Light",
+            "id": "078CFA07",
+            "gender": "female"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "The Discovery of Light",
+            "id": "6C74AD78",
+            "gender": "male"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Cloves in Kitchen Cabinets",
+            "id": "724DDF0E",
+            "gender": "female"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Everyday Reflections",
+            "id": "7E5B1A6F",
+            "gender": "male"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 2",
+            "id": "B8658275",
+            "gender": "female"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 2",
+            "id": "2C169DC8",
+            "gender": "male"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Texts of the Ancient Past",
+            "id": "CAFADB60",
+            "gender": "female"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Texts of the Ancient Past",
+            "id": "E7AA65F9",
+            "gender": "male"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Disappearing Socks",
+            "id": "D08B6939",
+            "gender": "female"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Routine Details",
+            "id": "9C3D7E2B",
+            "gender": "male"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 3",
+            "id": "482A4A3E",
+            "gender": "female"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 3",
+            "id": "76DE6AC6",
+            "gender": "male"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Woodworking Joinery Techniques",
+            "id": "1D177640",
+            "gender": "female"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Woodworking Joinery Techniques",
+            "id": "5DC1A41C",
+            "gender": "male"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Puzzling Over Puzzles",
+            "id": "FFC5678F",
+            "gender": "female"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Commonplace Instances",
+            "id": "1F4A8B7C",
+            "gender": "male"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 4",
+            "id": "C2EF776B",
+            "gender": "female"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 4",
+            "id": "501A7D44",
+            "gender": "male"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Explanation of the Coat of Arms",
+            "id": "F2D51115",
+            "gender": "female"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Explanation of the Coat of Arms",
+            "id": "C6A031AA",
+            "gender": "male"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Bread, crust, kitchens",
+            "id": "864597AE",
+            "gender": "female"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Simple Realities",
+            "id": "3D9E2A5F",
+            "gender": "male"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 5",
+            "id": "9E3333FD",
+            "gender": "female"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 5",
+            "id": "349AD434",
+            "gender": "male"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Significance of History Items",
+            "id": "3A967BBB",
+            "gender": "female"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Significance of History Items",
+            "id": "54A26906",
+            "gender": "male"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Empty Parking Lots",
+            "id": "ED0FAF44",
+            "gender": "female"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Ordinary Moments",
+            "id": "B7C1D9F3",
+            "gender": "male"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 6",
+            "id": "2F9CE4D9",
+            "gender": "female"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 6",
+            "id": "C2A5F52B",
+            "gender": "male"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Ancenstral Documentation",
+            "id": "7F47BE21",
+            "gender": "female"
+        },
+        {
+            "topic": "boring",
+            "subtopic": "Ancenstral Documentation",
+            "id": "D115F880",
+            "gender": "male"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "The Lost & Found Bin",
+            "id": "3E29977E",
+            "gender": "female"
+        },
+        {
+            "topic": "meandering",
+            "subtopic": "Unremarkable Days",
+            "id": "E2F4A7C9",
+            "gender": "male"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 7",
+            "id": "04D7171E",
+            "gender": "female"
+        },
+        {
+            "topic": "weather",
+            "subtopic": "Weather 7",
+            "id": "10EB5232",
+            "gender": "male"
+        }
+    ]
+}
